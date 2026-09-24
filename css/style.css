@@ -551,7 +551,10 @@ sup.ast { color: var(--accent); font-family: var(--sans); font-style: normal; fo
 .step--done b { color: var(--ice); }
 .done__mail { background: rgba(158,234,255,.1); border: 1px solid rgba(158,234,255,.35); border-radius: 14px; padding: 16px 18px; color: var(--ice) !important; }
 .done__hint { font-size: 13px; color: var(--mist) !important; }
-.step--done .btn { margin-top: 12px; min-width: 200px; }
+.done__actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
+.done__actions .btn { min-width: 190px; }
+.done__status { text-align: center; }
+.form__status.is-ok { color: var(--accent); }
 .pay__soon { border: 1px dashed var(--mist); border-radius: 14px; padding: 22px; }
 .pay__soon span { font: 12px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--warm); }
 .pay__soon p { margin: 8px 0 0; color: var(--ice-dim); }

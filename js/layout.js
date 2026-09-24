@@ -197,8 +197,12 @@
         <h3>Merci <span data-done-name></span>&nbsp;!</h3>
         <p>Votre don de <b data-done-amount></b> par <b data-done-method></b> est bien enregistré.</p>
         <p class="done__mail">📩 Nous vous avons envoyé un e-mail à <b data-done-email></b> avec toutes les informations pour finaliser votre don.</p>
-        <p class="done__hint">Vous ne le voyez pas&nbsp;? Pensez à regarder dans vos courriers indésirables.</p>
-        <button type="button" class="btn btn--accent" data-close><span>Fermer</span></button>
+        <p class="done__hint">Vous ne le voyez pas d'ici quelques minutes&nbsp;? Regardez dans vos <b>courriers indésirables</b>. S'il s'y trouve, cliquez sur « Ce n'est pas un spam » : nos prochains e-mails arriveront directement.</p>
+        <div class="done__actions">
+          <button type="button" class="btn btn--ghost" data-resend><span>Renvoyer l'e-mail</span></button>
+          <button type="button" class="btn btn--accent" data-close><span>Fermer</span></button>
+        </div>
+        <p class="form__status done__status" role="status"></p>
       </fieldset>
     </form>
   </dialog>`;

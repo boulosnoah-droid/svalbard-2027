@@ -73,6 +73,12 @@ assert.strictEqual(tb.B4, 350, "tableau : reçus"); assert.strictEqual(tb.B5, 0,
 tb.B6 = 150; ctx.surModification({ range: { getSheet: () => sheets["Tableau de bord"], getColumn: () => 2, getRow: () => 6 } });
 assert.strictEqual(tb.B7, 500, "total = dons payés + autres recettes");
 assert.strictEqual(JSON.parse(ctx.doGet().s).raised, 500);
+// 5b) bouton « Renvoyer l'e-mail »
+const n0 = mails.length;
+assert(post({ kind: "renvoi", email: "lea@example.com", reference: "Don Svalbard 2027 – Léa Exemple" }).ok, "renvoi ok");
+assert.strictEqual(mails.length, n0 + 1); assert.strictEqual(mails[n0].to, "lea@example.com"); assert(/finaliser/.test(mails[n0].subject));
+assert.strictEqual(sheets.Dons.rows.length, 3, "le renvoi n'ajoute pas de ligne");
+assert.strictEqual(post({ kind: "renvoi", email: "inconnu@example.com", reference: "x" }).erreur, "introuvable");
 // 6) messages
 assert(post({ kind: "livre", nom: "Anne", email: "anne@example.com", quantite: "2", remise: "Par la poste", adresse: "Rue 1, Bulle" }).ok);
 assert(post({ kind: "partenariat", nom: "Paul", email: "paul@example.com", organisation: "Sport SA", soutien: "Don financier, Prêt de matériel" }).ok);

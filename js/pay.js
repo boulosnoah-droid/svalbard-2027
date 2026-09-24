@@ -118,7 +118,21 @@ window.SvalbardPay = (() => {
       $("[data-done-amount]", form).textContent = "CHF " + fmt(don.montant);
       $("[data-done-method]", form).textContent = methode;
       $("[data-done-email]", form).textContent = don.email;
+      $(".done__status", form).textContent = ""; $("[data-resend]", form).disabled = false;
       go(4);
+    });
+    // étape 4 : renvoyer l'e-mail récapitulatif (sans créer de nouveau don)
+    $("[data-resend]", form).addEventListener("click", async () => {
+      if (!don) return;
+      const btn = $("[data-resend]", form), status = $(".done__status", form);
+      btn.disabled = true; status.className = "form__status done__status"; status.textContent = "Envoi…";
+      const err = await send("renvoi", { email: don.email, reference: don.reference }).then(() => null, (e) => e.message);
+      if (err) {
+        status.textContent = err === "limite" ? "Trop d'envois pour cette adresse : réessayez dans une heure." : "Le renvoi n'a pas fonctionné. Écrivez-nous à " + CFG.email + ".";
+        btn.disabled = false; return;
+      }
+      status.classList.add("is-ok"); status.textContent = "E-mail renvoyé à " + don.email + " ✓";
+      setTimeout(() => (btn.disabled = false), 30000); // pas plus d'un renvoi toutes les 30 secondes
     });
     dialog.addEventListener("close", () => { if ($('[data-step="4"]', form).classList.contains("is-on")) { form.reset(); don = null; amountField.hidden = true; org.hidden = true; go(1); } });
   }

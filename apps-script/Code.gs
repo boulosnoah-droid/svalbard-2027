@@ -24,14 +24,16 @@ const IBAN = "";               // ex. "CH12 3456 7890 1234 5678 9"
 const TITULAIRE = "Association Des Alpes à l'Arctique";
 const LIEN_TWINT = "";         // lien de paiement TWINT de l'association
 const OBJECTIF = 40000;        // CHF
-const SIGNATURE = "Les neuf élèves du Collège du Sud\nDes Alpes à l'Arctique — Svalbard 2027";
+const SITE = "https://boulosnoah-droid.github.io/svalbard-2027/";
+const SIGNATURE = "Les neuf élèves du Collège du Sud\nDes Alpes à l'Arctique — Svalbard 2027\n" + SITE +
+  "\n\nVous recevez cet e-mail parce que vous avez fait un don sur notre site. Une question ? Répondez simplement à ce message.";
 
 const COLONNES = {
   Dons: ["Date", "Montant (CHF)", "Type", "Prénom", "Nom", "Organisation", "E-mail", "Message",
          "Nom affiché ?", "Communication", "Payé ?", "Date du paiement", "Merci envoyé ?", "Moyen de paiement"],
   Messages: ["Date", "Type", "Nom", "E-mail", "Organisation", "Téléphone", "Détails", "Message", "Traité ?"],
 };
-const COL = { montant: 2, prenom: 4, email: 7, affiche: 9, ref: 10, paye: 11, datePaye: 12, merci: 13 };
+const COL = { montant: 2, prenom: 4, email: 7, affiche: 9, ref: 10, paye: 11, datePaye: 12, merci: 13, methode: 14 };
 
 /* =====================================================================
    1) À lancer UNE FOIS après avoir collé le script : prépare tout.
@@ -104,15 +106,18 @@ function doPost(e) {
               `le donateur reçoit alors automatiquement un e-mail de remerciement.\n${classeur_().getUrl()}`,
       });
 
-      MailApp.sendEmail({
-        to: d.email,
-        replyTo: EQUIPE_EMAIL,
-        name: "Des Alpes à l'Arctique",
-        subject: "Votre don pour le Svalbard : les informations pour finaliser ✳ Des Alpes à l'Arctique",
-        body: `Bonjour ${d.prenom},\n\nUn immense merci pour votre don de CHF ${montant} à notre voyage d'étude au Svalbard !\n\n` +
-              paiement_(d.reference, montant, d.methode) +
-              `\n\nDès que votre paiement nous parvient, nous vous envoyons une confirmation.\n\n${SIGNATURE}`,
-      });
+      mailDonateur_(d.email, d.prenom, montant, d.reference, d.methode);
+    } else if (d.kind === "renvoi") {
+      // bouton « Renvoyer l'e-mail » : on retrouve le don (même e-mail + même communication) et on renvoie
+      const rows = feuille_("Dons").getDataRange().getValues();
+      for (let i = rows.length - 1; i >= 1; i--) {
+        const r = rows[i];
+        if (String(r[COL.email - 1]).toLowerCase() === String(d.email).toLowerCase() && r[COL.ref - 1] === d.reference) {
+          mailDonateur_(r[COL.email - 1], r[COL.prenom - 1], r[COL.montant - 1], r[COL.ref - 1], r[COL.methode - 1]);
+          return json_({ ok: true });
+        }
+      }
+      return json_({ ok: false, erreur: "introuvable" });
     } else {
       const type = { contact: "Contact", partenariat: "Partenariat", livre: "Livre" }[d.kind] || "Autre";
       const details = d.kind === "livre" ? `${d.quantite || 1} exemplaire(s) · ${d.remise || ""}${d.adresse ? " · " + d.adresse : ""}`
@@ -156,7 +161,7 @@ function surModification(e) {
     to: row[COL.email - 1],
     replyTo: EQUIPE_EMAIL,
     name: "Des Alpes à l'Arctique",
-    subject: "Paiement bien reçu — merci ! ✳ Des Alpes à l'Arctique",
+    subject: "Nous avons bien reçu votre don, merci ! — Des Alpes à l'Arctique",
     body: `Bonjour ${row[COL.prenom - 1]},\n\nNous avons bien reçu votre don de CHF ${row[COL.montant - 1]}. ` +
           `Merci du fond du cœur : grâce à vous, le Svalbard se rapproche !\n\n${SIGNATURE}`,
   });
@@ -200,6 +205,17 @@ function testerUnMessage() {
 }
 
 /* ---------- outils ---------- */
+function mailDonateur_(email, prenom, montant, ref, methode) {
+  MailApp.sendEmail({
+    to: email,
+    replyTo: EQUIPE_EMAIL,
+    name: "Des Alpes à l'Arctique",
+    subject: "Merci pour votre don, voici comment le finaliser — Des Alpes à l'Arctique",
+    body: `Bonjour ${prenom},\n\nUn immense merci pour votre don de CHF ${montant} à notre voyage d'étude au Svalbard !\n\n` +
+          paiement_(ref, montant, methode) +
+          `\n\nDès que votre paiement nous parvient, nous vous envoyons une confirmation.\n\n${SIGNATURE}`,
+  });
+}
 function classeur_() {
   const ss = ID_FEUILLE ? SpreadsheetApp.openById(ID_FEUILLE) : SpreadsheetApp.getActiveSpreadsheet();
   if (!ss) throw new Error("Remplissez ID_FEUILLE en haut du script (identifiant de la feuille Google Sheets).");
