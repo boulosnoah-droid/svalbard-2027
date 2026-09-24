@@ -24,8 +24,8 @@ Tout se règle dans **`js/config.js`** :
 - [ ] `twintQr` : déposer l'image du QR code dans `assets/img/twint-qr.png`, puis écrire `"assets/img/twint-qr.png"`.
 - [ ] `formEndpoint` : l'adresse Google Apps Script (voir plus bas).
 - [ ] `raised` : le montant déjà réuni, à mettre à jour de temps en temps (laisser `null` pour ne rien afficher).
-- [ ] Faire relire les textes et les légendes des nouvelles photos par Daniel.
-- [ ] Vérifier que toute l'équipe est d'accord pour que la photo de groupe et les prénoms soient publics.
+- [ ] Faire relire les textes, les légendes des nouvelles photos et les infos de la section « Le Svalbard en bref » par Daniel.
+- [ ] Vérifier que toute l'équipe est d'accord pour que les noms et prénoms soient publics. Il n'y a volontairement **aucune photo de groupe** sur le site.
 
 ## Brancher les formulaires (historique des dons et des messages)
 
