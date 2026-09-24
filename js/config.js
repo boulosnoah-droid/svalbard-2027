@@ -8,7 +8,7 @@ window.SITE_CONFIG = {
   // Adresse du « Web App » Google Apps Script (voir apps-script/Code.gs et README.md).
   // C'est elle qui permet d'envoyer les formulaires, d'enregistrer les dons et de mettre
   // la jauge à jour toute seule. Tant qu'elle est vide, les formulaires affichent l'e-mail.
-  formEndpoint: "",
+  formEndpoint: "https://script.google.com/macros/s/AKfycbzM26T-9efHlNu3QH6lviOiPpP38ccCTc0KDuFkYfBNwI5cDDK5GgdzCYZ7MoAVdlop/exec",
 
   // ---- Paiement des dons -------------------------------------------------
   // Compte bancaire de l'association (pour le virement)
