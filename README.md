@@ -69,20 +69,17 @@ Le site ne peut pas savoir tout seul qu'un virement est arrivé : aucune banque 
 ## Voir le site en local
 
 ```bash
-cd ~/Projets/Web/svalbard-2027 && python3 -m http.server 4173
+cd ~/Projets/Web/des-alpes-a-l-arctique && python3 -m http.server 4173
 ```
 puis ouvrir http://localhost:4173
 
-## Publier le site
+## Le site en ligne
 
-1. Rendre le dépôt public : GitHub → Settings → General → *Change visibility* → Public.
-2. Settings → **Pages** → Source : *Deploy from a branch* → `main` / `(root)` → Save.
-3. Environ une minute plus tard, le site est en ligne à `https://des-alpes-a-l-arctique.github.io/`.
-
-### Changer l'adresse (URL)
-- **Renommer le dépôt** : l'adresse devient `boulosnoah-droid.github.io/<nouveau-nom>/`.
-- **Une organisation GitHub gratuite** (ex. `des-alpes-a-l-arctique`) : le site devient `des-alpes-a-l-arctique.github.io`, et il appartient au groupe plutôt qu'à Noah seul.
-- **Un vrai nom de domaine**, par exemple `desalpesalarctique.ch` (environ CHF 10 à 20 par an chez un registraire suisse) : Settings → Pages → *Custom domain*, puis ajouter les enregistrements DNS indiqués par GitHub. Le HTTPS reste gratuit.
+- **Adresse** : https://des-alpes-a-l-arctique.github.io (GitHub Pages, branche `main`, dossier racine).
+- **Dépôt** : https://github.com/des-alpes-a-l-arctique/des-alpes-a-l-arctique.github.io, dans l'organisation GitHub du projet `des-alpes-a-l-arctique`. Pour ajouter un membre du groupe : organisation → *People* → *Invite member*.
+- Chaque modification envoyée sur `main` met le site à jour en environ une minute.
+- **Aperçu non référencé** : chaque page contient `<meta name="robots" content="noindex, nofollow">` et `robots.txt` bloque les moteurs de recherche. **Au lancement officiel**, retirer cette balise des 6 pages et remplacer `Disallow: /` par `Allow: /` dans `robots.txt`.
+- **Nom de domaine perso** (ex. `desalpesalarctique.ch`, environ CHF 10 à 20 par an) : Settings → Pages → *Custom domain*, puis ajouter les enregistrements DNS indiqués par GitHub. Penser ensuite à mettre à jour `SITE` dans `apps-script/Code.gs`.
 
 ## Crédits
 Photos © Daniel Rohrbasser, [artaventure.ch](https://artaventure.ch), et photos libres de Wikimedia Commons (auteurs et licences dans `credits.html` et `assets/credits.json`). Logo dessiné par un membre du groupe.
