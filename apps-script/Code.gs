@@ -82,7 +82,8 @@ function doPost(e) {
   try {
     const d = JSON.parse(e.postData.contents);
     if (d.website) return json_({ ok: true }); // champ piège anti-robots
-    if (!propre_(d.email) || trop_(d.email)) return json_({ ok: false });
+    if (!propre_(d.email)) return json_({ ok: false, erreur: "email" });
+    if (trop_(d.email)) return json_({ ok: false, erreur: "limite" });
     const date = new Date();
 
     if (d.kind === "don") {
@@ -227,10 +228,11 @@ function feuille_(nom) {
 }
 function t_(v) { return String(v == null ? "" : v).slice(0, 2000).replace(/^[=+\-@]/, "'$&"); } // pas de formules injectées
 function propre_(m) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(m || "")); }
-function trop_(email) { // limite : 5 envois par adresse et par heure
-  const c = CacheService.getScriptCache(), k = "n_" + String(email).toLowerCase();
+function trop_(email) { // anti-spam : 15 envois maximum par adresse et par heure (sauf l'adresse de l'équipe)
+  if (String(email).toLowerCase() === EQUIPE_EMAIL) return false;
+  const c = CacheService.getScriptCache(), k = "lim_" + String(email).toLowerCase();
   const n = Number(c.get(k) || 0) + 1;
   c.put(k, String(n), 3600);
-  return n > 5;
+  return n > 15;
 }
 function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }

@@ -106,9 +106,14 @@ window.SvalbardPay = (() => {
       const methode = { twint: "TWINT", virement: "virement bancaire", carte: "carte" }[tab.dataset.tab] || tab.textContent;
       const status = $('[data-step="3"] .form__status', form);
       const btn = $("[data-finish]", form); btn.disabled = true; status.textContent = "";
-      const ok = await send("don", { ...don, methode }).then(() => true, () => false);
+      const err = await send("don", { ...don, methode }).then(() => null, (e) => e.message);
       btn.disabled = false;
-      if (!ok) { status.innerHTML = `L'envoi n'a pas fonctionné. Réessayez, ou écrivez-nous à <b>${esc(CFG.email)}</b>.`; return; }
+      if (err) {
+        status.innerHTML = err === "limite" ? `Trop d'envois depuis cette adresse. Réessayez dans une heure, ou écrivez-nous à <b>${esc(CFG.email)}</b>.`
+          : err === "email" ? "Cette adresse e-mail ne semble pas valide : revenez à l'étape précédente pour la corriger."
+          : `L'envoi n'a pas fonctionné. Réessayez, ou écrivez-nous à <b>${esc(CFG.email)}</b>.`;
+        return;
+      }
       $("[data-done-name]", form).textContent = don.prenom;
       $("[data-done-amount]", form).textContent = "CHF " + fmt(don.montant);
       $("[data-done-method]", form).textContent = methode;

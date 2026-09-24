@@ -59,7 +59,16 @@
   /* ---------- envoi des formulaires ---------- */
   async function send(kind, data) {
     if (!CFG.formEndpoint) throw new Error("no-endpoint");
-    await fetch(CFG.formEndpoint, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ kind, ...data, date: new Date().toISOString(), page: location.pathname }) });
+    const body = JSON.stringify({ kind, ...data, date: new Date().toISOString(), page: location.pathname });
+    let res;
+    try {
+      // "text/plain" évite la requête préalable CORS ; Google Apps Script renvoie une réponse lisible
+      res = await fetch(CFG.formEndpoint, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body });
+    } catch (e) {
+      return true; // réponse illisible (réseau/CORS) : la requête est partie, on ne renvoie pas pour éviter un doublon
+    }
+    const r = await res.json().catch(() => ({ ok: true }));
+    if (r && r.ok === false) throw new Error(r.erreur || "refus");
     return true;
   }
   function validate(scope) {
@@ -89,7 +98,9 @@
           form.reset(); form.hidden = true;
           $(".modal__done", form.closest("dialog")).hidden = false;
         } catch (x) {
-          status.innerHTML = `L'envoi en ligne n'est pas encore activé. Écrivez-nous à <b>${CFG.email}</b> <button type="button" class="copy" data-copy-email>Copier</button>`;
+          status.innerHTML = x.message === "limite" ? `Trop d'envois depuis cette adresse. Réessayez dans une heure, ou écrivez-nous à <b>${CFG.email}</b>.`
+            : x.message === "email" ? "Cette adresse e-mail ne semble pas valide."
+            : `L'envoi n'a pas fonctionné. Écrivez-nous à <b>${CFG.email}</b> <button type="button" class="copy" data-copy-email>Copier</button>`;
         }
         btn.disabled = false;
       });
