@@ -54,15 +54,13 @@ function installer() {
   ]);
   tb.getRange("B3").setValue(OBJECTIF);
   tb.getRange("B6").setValue(0);
-  // setFormula lit toujours la syntaxe anglaise (virgules), quelle que soit la langue de la feuille
-  tb.getRange("B4").setFormula('=SUMIF(Dons!K:K,"oui",Dons!B:B)');
-  tb.getRange("B5").setFormula('=SUMIF(Dons!K:K,"non",Dons!B:B)');
-  tb.getRange("B7").setFormula("=B4+B6");
-  tb.getRange("B8").setFormula('=COUNTIF(Dons!K:K,"oui")');
-  tb.getRange("B9").setFormula("=IF(B3>0,B7/B3,0)");
+  tb.getRange("A11").setValue("Les chiffres se mettent à jour tout seuls (calculés par le script, pas de formule).");
+  tb.getRange("A11").setFontStyle("italic").setFontColor("#888888");
+  majTableau_();
   tb.getRange("A1").setFontWeight("bold").setFontSize(14);
   tb.getRange("A7:B7").setFontWeight("bold");
   tb.getRange("B3:B7").setNumberFormat("#,##0 \"CHF\"");
+  tb.getRange("B8").setNumberFormat("0");
   tb.getRange("B9").setNumberFormat("0%");
   tb.getRange("B6").setBackground("#fff5d6");
   tb.setColumnWidth(1, 420);
@@ -90,6 +88,7 @@ function doPost(e) {
       const nomAffiche = d.nomPublic === "oui" ? "oui" : "non";
       feuille_("Dons").appendRow([date, montant, t_(d.type), t_(d.prenom), t_(d.nom), t_(d.organisation), t_(d.email),
         t_(d.message), nomAffiche, t_(d.reference), "non", "", "non"]);
+      majTableau_();
 
       MailApp.sendEmail({
         to: EQUIPE_EMAIL,
@@ -135,13 +134,8 @@ function doPost(e) {
    3) Chiffres lus par le site (GET) : total réuni + prénoms publics
    ===================================================================== */
 function doGet() {
-  const ss = classeur_();
-  const tb = ss.getSheetByName("Tableau de bord");
-  const total = tb ? Number(tb.getRange("B7").getValue()) || 0 : 0;
-  const rows = feuille_("Dons").getDataRange().getValues().slice(1);
-  const payes = rows.filter((r) => r[COL.paye - 1] === "oui");
-  const noms = payes.filter((r) => r[COL.affiche - 1] === "oui").map((r) => String(r[COL.prenom - 1]).trim()).filter(Boolean);
-  return json_({ raised: total, goal: OBJECTIF, donors: payes.length, names: noms.slice(-60) });
+  const t = majTableau_(false); // lecture seule : les visites du site n'écrivent rien
+  return json_({ raised: t.total, goal: OBJECTIF, donors: t.nbPayes, names: t.noms.slice(-60) });
 }
 
 /* =====================================================================
@@ -149,6 +143,7 @@ function doGet() {
    ===================================================================== */
 function surModification(e) {
   const r = e.range, sh = r.getSheet();
+  if (sh.getName() === "Tableau de bord" || sh.getName() === "Dons") majTableau_();
   if (sh.getName() !== "Dons" || r.getColumn() !== COL.paye || r.getRow() < 2) return;
   const row = sh.getRange(r.getRow(), 1, 1, COLONNES.Dons.length).getValues()[0];
   if (row[COL.paye - 1] !== "oui") return;
@@ -163,6 +158,31 @@ function surModification(e) {
           `Merci du fond du cœur : grâce à vous, le Svalbard se rapproche !\n\n${SIGNATURE}`,
   });
   sh.getRange(r.getRow(), COL.merci).setValue("oui");
+}
+
+/* ---------- Calcul du tableau de bord (sans formule : marche dans toutes les langues) ---------- */
+function majTableau_(ecrire = true) {
+  const ss = classeur_();
+  const rows = feuille_("Dons").getDataRange().getValues().slice(1);
+  let recu = 0, annonce = 0, nbPayes = 0; const noms = [];
+  rows.forEach((r) => {
+    const m = Number(r[COL.montant - 1]) || 0;
+    if (r[COL.paye - 1] === "oui") {
+      recu += m; nbPayes++;
+      if (r[COL.affiche - 1] === "oui" && String(r[COL.prenom - 1]).trim()) noms.push(String(r[COL.prenom - 1]).trim());
+    } else if (m) annonce += m;
+  });
+  const tb = ss.getSheetByName("Tableau de bord");
+  const autres = tb ? Number(tb.getRange("B6").getValue()) || 0 : 0;
+  const total = recu + autres;
+  if (tb && ecrire) {
+    tb.getRange("B4").setValue(recu);
+    tb.getRange("B5").setValue(annonce);
+    tb.getRange("B7").setValue(total);
+    tb.getRange("B8").setValue(nbPayes);
+    tb.getRange("B9").setValue(OBJECTIF > 0 ? total / OBJECTIF : 0);
+  }
+  return { total, recu, annonce, nbPayes, noms };
 }
 
 /* ---------- Tests depuis l'éditeur (bouton « Exécuter ») ---------- */

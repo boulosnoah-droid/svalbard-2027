@@ -13,8 +13,8 @@ function Sheet(name) {
   this.getRange = (a, b, c, d) => {
     if (typeof a === "string") {
       return { setValues(v) { self.cells[a] = v; }, setValue(v) { self.cells[a] = v; }, setFormula(f) { self.cells[a] = f; }, setFontWeight() { return this; }, setFontSize() { return this; }, setNumberFormat() {}, setBackground() {}, setDataValidation() {},
-        getValue() { // lecture de B7 : on calcule le total comme la formule
-          const paid = sheets.Dons.rows.slice(1).filter((r) => r[10] === "oui").reduce((s, r) => s + r[1], 0); return paid + (self.other || 0); } };
+        setFontStyle() { return this; }, setFontColor() { return this; },
+        getValue() { return self.cells[a] !== undefined ? self.cells[a] : ""; } };
     }
     const row = a, col = b, nr = c || 1, nc = d || 1;
     return {
@@ -64,6 +64,12 @@ ctx.surModification({ range: sheets.Dons.getRange(2, 11) }); assert.strictEqual(
 // 5) GET après paiement : total 350, seul Marc (nom public) apparaît
 g = JSON.parse(ctx.doGet().s);
 assert.strictEqual(g.raised, 350); assert.strictEqual(g.donors, 2); assert.deepStrictEqual(g.names, ["Marc"]);
+const tb = sheets["Tableau de bord"].cells;
+assert.strictEqual(tb.B4, 350, "tableau : reçus"); assert.strictEqual(tb.B5, 0, "tableau : annoncés"); assert.strictEqual(tb.B8, 2);
+// recettes hors site (case jaune) : ajoutées au total
+tb.B6 = 150; ctx.surModification({ range: { getSheet: () => sheets["Tableau de bord"], getColumn: () => 2, getRow: () => 6 } });
+assert.strictEqual(tb.B7, 500, "total = dons payés + autres recettes");
+assert.strictEqual(JSON.parse(ctx.doGet().s).raised, 500);
 // 6) messages
 assert(post({ kind: "livre", nom: "Anne", email: "anne@example.com", quantite: "2", remise: "Par la poste", adresse: "Rue 1, Bulle" }).ok);
 assert(post({ kind: "partenariat", nom: "Paul", email: "paul@example.com", organisation: "Sport SA", soutien: "Don financier, Prêt de matériel" }).ok);
