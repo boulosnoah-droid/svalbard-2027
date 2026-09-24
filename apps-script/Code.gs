@@ -47,17 +47,19 @@ function installer() {
   let tb = ss.getSheetByName("Tableau de bord");
   if (!tb) tb = ss.insertSheet("Tableau de bord", 0);
   tb.clear();
-  tb.getRange("A1:B9").setValues([
-    ["Tableau de bord — Des Alpes à l'Arctique", ""],
-    ["", ""],
-    ["Objectif (CHF)", OBJECTIF],
-    ["Dons reçus sur le site (payés)", '=SUMIF(Dons!K:K,"oui",Dons!B:B)'],
-    ["Dons annoncés, pas encore reçus", '=SUMIF(Dons!K:K,"non",Dons!B:B)'],
-    ["Autres recettes (ventes, dons en main propre…) → à écrire ici", 0],
-    ["TOTAL RÉUNI (affiché sur le site)", "=B4+B6"],
-    ["Nombre de dons reçus", '=COUNTIF(Dons!K:K,"oui")'],
-    ["Progression", "=IF(B3>0,B7/B3,0)"],
+  tb.getRange("A1:A9").setValues([
+    ["Tableau de bord — Des Alpes à l'Arctique"], [""], ["Objectif (CHF)"], ["Dons reçus sur le site (payés)"],
+    ["Dons annoncés, pas encore reçus"], ["Autres recettes (ventes, dons en main propre…) → à écrire ici"],
+    ["TOTAL RÉUNI (affiché sur le site)"], ["Nombre de dons reçus"], ["Progression"],
   ]);
+  tb.getRange("B3").setValue(OBJECTIF);
+  tb.getRange("B6").setValue(0);
+  // setFormula lit toujours la syntaxe anglaise (virgules), quelle que soit la langue de la feuille
+  tb.getRange("B4").setFormula('=SUMIF(Dons!K:K,"oui",Dons!B:B)');
+  tb.getRange("B5").setFormula('=SUMIF(Dons!K:K,"non",Dons!B:B)');
+  tb.getRange("B7").setFormula("=B4+B6");
+  tb.getRange("B8").setFormula('=COUNTIF(Dons!K:K,"oui")');
+  tb.getRange("B9").setFormula("=IF(B3>0,B7/B3,0)");
   tb.getRange("A1").setFontWeight("bold").setFontSize(14);
   tb.getRange("A7:B7").setFontWeight("bold");
   tb.getRange("B3:B7").setNumberFormat("#,##0 \"CHF\"");

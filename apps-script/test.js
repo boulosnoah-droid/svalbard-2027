@@ -12,7 +12,7 @@ function Sheet(name) {
   const self = this;
   this.getRange = (a, b, c, d) => {
     if (typeof a === "string") {
-      return { setValues(v) { self.cells[a] = v; }, setFontWeight() { return this; }, setFontSize() { return this; }, setNumberFormat() {}, setBackground() {}, setDataValidation() {},
+      return { setValues(v) { self.cells[a] = v; }, setValue(v) { self.cells[a] = v; }, setFormula(f) { self.cells[a] = f; }, setFontWeight() { return this; }, setFontSize() { return this; }, setNumberFormat() {}, setBackground() {}, setDataValidation() {},
         getValue() { // lecture de B7 : on calcule le total comme la formule
           const paid = sheets.Dons.rows.slice(1).filter((r) => r[10] === "oui").reduce((s, r) => s + r[1], 0); return paid + (self.other || 0); } };
     }
