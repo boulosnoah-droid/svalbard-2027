@@ -24,7 +24,7 @@ const IBAN = "";               // ex. "CH12 3456 7890 1234 5678 9"
 const TITULAIRE = "Association Des Alpes à l'Arctique";
 const LIEN_TWINT = "";         // lien de paiement TWINT de l'association
 const OBJECTIF = 40000;        // CHF
-const SITE = "https://boulosnoah-droid.github.io/svalbard-2027/";
+const SITE = "https://boulosnoah-droid.github.io/des-alpes-a-l-arctique/";
 const SIGNATURE = "Les neuf élèves du Collège du Sud\nDes Alpes à l'Arctique — Svalbard 2027\n" + SITE +
   "\n\nVous recevez cet e-mail parce que vous avez fait un don sur notre site. Une question ? Répondez simplement à ce message.";
 

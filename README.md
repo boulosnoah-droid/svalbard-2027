@@ -77,7 +77,7 @@ puis ouvrir http://localhost:4173
 
 1. Rendre le dépôt public : GitHub → Settings → General → *Change visibility* → Public.
 2. Settings → **Pages** → Source : *Deploy from a branch* → `main` / `(root)` → Save.
-3. Environ une minute plus tard, le site est en ligne à `https://boulosnoah-droid.github.io/svalbard-2027/`.
+3. Environ une minute plus tard, le site est en ligne à `https://boulosnoah-droid.github.io/des-alpes-a-l-arctique/`.
 
 ### Changer l'adresse (URL)
 - **Renommer le dépôt** : l'adresse devient `boulosnoah-droid.github.io/<nouveau-nom>/`.
