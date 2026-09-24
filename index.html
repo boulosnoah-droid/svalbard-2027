@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Des Alpes à l'Arctique — Voyage d'étude Svalbard 2027</title>
+  <meta name="description" content="Neuf étudiants du Collège du Sud à Bulle partent deux semaines au Svalbard à l'été 2027 pour un voyage d'étude sur le réchauffement climatique. Soutenez-nous.">
+  <meta name="theme-color" content="#0a1216">
+  <meta property="og:title" content="Des Alpes à l'Arctique — Svalbard 2027">
+  <meta property="og:description" content="Neuf étudiants du Collège du Sud en route vers le Svalbard. Voyage d'étude et de sensibilisation au réchauffement climatique.">
+  <meta property="og:image" content="assets/img/ours-polaire.jpg">
+  <link rel="icon" href="assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="is-loading">
+
+  <!-- ============ LOADER ============ -->
+  <div class="loader" aria-hidden="true">
+    <img class="loader__logo" src="assets/img/logo-blanc.png" alt="">
+    <div class="loader__lat"><span data-loader-lat>46.6</span>°N</div>
+    <div class="loader__bar"><span></span></div>
+    <div class="loader__labels mono"><span>Bulle</span><span>Longyearbyen</span></div>
+  </div>
+
+  <canvas class="topo" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="peek" aria-hidden="true"><img alt=""></div>
+  <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav">
+    <a href="#accueil" class="nav__brand" aria-label="Accueil">
+      <img src="assets/img/logo-blanc.png" alt="">
+      <span>Des Alpes<br><em>à l'Arctique</em></span>
+    </a>
+    <nav class="nav__links" aria-label="Navigation principale">
+      <a href="#voyage">Le voyage</a>
+      <a href="#svalbard">Le Svalbard</a>
+      <a href="#projet">Le projet</a>
+      <a href="#equipe">L'équipe</a>
+      <a href="#images">En images</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="nav__actions">
+      <a href="#soutenir" class="btn btn--accent magnetic"><span>Nous soutenir</span></a>
+      <button class="nav__burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </header>
+
+  <div class="menu" aria-hidden="true">
+    <nav class="menu__links">
+      <a href="#voyage"><small>01</small>Le voyage</a>
+      <a href="#svalbard"><small>02</small>Le Svalbard</a>
+      <a href="#projet"><small>03</small>Le projet</a>
+      <a href="#themes"><small>04</small>Nos thèmes</a>
+      <a href="#equipe"><small>05</small>L'équipe</a>
+      <a href="#images"><small>07</small>En images</a>
+      <a href="#soutenir"><small>09</small>Nous soutenir</a>
+      <a href="#contact"><small>10</small>Contact</a>
+    </nav>
+    <div class="menu__foot mono"><a data-email-link></a><span>78°13′N · 15°38′E</span></div>
+  </div>
+
+  <main>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="accueil">
+      <canvas class="snow" aria-hidden="true"></canvas>
+      <div class="hero__meta mono">
+        <span>Voyage d'étude · Été 2027</span>
+        <span>Collège du Sud, Bulle → Svalbard</span>
+      </div>
+      <h1 class="hero__title">
+        <span class="line"><span class="word">Des&nbsp;Alpes</span></span>
+        <span class="line line--serif"><span class="word">à&nbsp;l'Arctique</span></span>
+      </h1>
+      <div class="hero__media">
+        <img src="assets/img/ours-polaire.jpg" alt="Ours polaire assis sur un rocher, montagnes enneigées en arrière-plan" fetchpriority="high">
+      </div>
+      <p class="hero__lede">Neuf étudiants du Collège du Sud en route vers le Svalbard, pour observer de leurs propres yeux un Arctique qui change.</p>
+      <div class="hero__scroll mono"><span class="hero__scroll-line"></span>Défiler</div>
+      <div class="hero__coords mono">
+        <span>46°37′N 7°03′E</span>
+        <span class="dash"></span>
+        <span>78°13′N 15°38′E</span>
+      </div>
+    </section>
+
+    <!-- ============ MARQUEE ============ -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <span>Svalbard 2027</span><i>✳</i><span class="serif">voyage d'étude</span><i>✳</i><span>9 étudiants</span><i>✳</i><span class="serif">deux semaines</span><i>✳</i><span>78° Nord</span><i>✳</i>
+        <span>Svalbard 2027</span><i>✳</i><span class="serif">voyage d'étude</span><i>✳</i><span>9 étudiants</span><i>✳</i><span class="serif">deux semaines</span><i>✳</i><span>78° Nord</span><i>✳</i>
+      </div>
+    </div>
+
+    <!-- ============ LE VOYAGE (latitude) ============ -->
+    <section class="journey" id="voyage">
+      <div class="journey__pin">
+        <svg class="globe" viewBox="0 0 800 800" aria-hidden="true"><defs><radialGradient id="gl" cx="40%" cy="35%"><stop offset="0" stop-color="#1c3a44"/><stop offset="1" stop-color="#0b1a20"/></radialGradient></defs><circle class="globe__sphere" cx="400" cy="400" r="380" fill="url(#gl)"/><path class="globe__grat"/><path class="globe__land"/><path class="globe__route"/><g class="globe__pts"></g></svg>
+        <div class="journey__head">
+          <p class="eyebrow mono">01 — Le voyage</p>
+          <h2 class="journey__lat"><span data-lat>46.6</span><sup>°N</sup></h2>
+          <p class="journey__km mono"><span data-km>0</span> km parcourus vers le nord</p>
+          <p class="journey__stop" data-stop><b>Bulle</b> — Le Collège du Sud, au pied des Préalpes</p>
+        </div>
+        <ol class="journey__ruler" aria-label="Repères de latitude entre Bulle et le Svalbard">
+          <li style="--p:0"><b>46.6°</b><span>Bulle</span><em>Le Collège du Sud, au pied des Préalpes</em></li>
+          <li style="--p:.42"><b>59.9°</b><span>Oslo</span><em>La Norvège continentale</em></li>
+          <li style="--p:.63"><b>66.6°</b><span>Cercle polaire</span><em>Le soleil de minuit commence ici</em></li>
+          <li style="--p:.73"><b>69.6°</b><span>Tromsø</span><em>La porte de l'Arctique</em></li>
+          <li style="--p:1"><b>78.2°</b><span>Longyearbyen</span><em>Svalbard — à 1 300 km du pôle Nord</em></li>
+        </ol>
+        <div class="journey__progress"><span></span></div>
+        <p class="journey__caption">Un archipel norvégien à mi-chemin entre la Norvège et le pôle Nord, où le climat se réchauffe <strong>6 à 7 fois plus vite</strong> que la moyenne mondiale.</p>
+      </div>
+    </section>
+
+    <!-- ============ LE SVALBARD ============ -->
+    <section class="svalbard" id="svalbard">
+      <div class="svalbard__head">
+        <p class="eyebrow mono">02 — Le Svalbard en bref</p>
+        <h2>Au bout<br><em class="serif">du monde habité</em></h2>
+        <p>Un archipel norvégien situé à mi-chemin entre la Norvège et le pôle Nord, l'un des endroits de la planète où le changement climatique est le plus rapide.</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><b><span data-count="60">0</span>%</b><span>du territoire couvert de glaciers</span></div>
+        <div class="stat"><b><span data-count="1300" data-sep>0</span><small>km</small></b><span>jusqu'au pôle Nord</span></div>
+        <div class="stat"><b><span data-count="3000" data-sep data-prefix="~">0</span></b><span>ours polaires pour 2 900 habitants</span></div>
+        <div class="stat stat--sm"><b>×<span data-count="7" data-prefix="6–">0</span></b><span>un réchauffement 6 à 7 fois plus rapide que la moyenne mondiale</span></div>
+      </div>
+      <div class="bento">
+        <article class="tile tile--wide" data-cursor="Glaciers">
+          <img src="assets/img/glacier-gimlebreen.jpg" alt="Front du glacier Gimlebreen" loading="lazy">
+          <div><span class="mono">Glaciers</span><h3>60&nbsp;% de glace</h3><p>Les glaciers couvrent plus de la moitié de l'archipel. Leurs fronts, qui se jettent dans la mer, sont des témoins directs du réchauffement.</p></div>
+        </article>
+        <article class="tile tile--tall" data-cursor="Ours">
+          <img src="assets/img/ours-nage.jpg" alt="Ours polaire à la nage" loading="lazy">
+          <div><span class="mono">Faune</span><h3>Plus d'ours que d'habitants</h3><p>Environ 3&nbsp;000 ours polaires pour 2&nbsp;900 habitants. C'est pour ça que les guides certifiés sont obligatoires dès qu'on sort des villages.</p></div>
+        </article>
+        <article class="tile tile--sun">
+          <div><span class="mono">Soleil de minuit</span><h3 class="serif">Le jour qui ne finit pas</h3><p>À Longyearbyen, le soleil ne se couche plus d'environ fin avril à fin août. Notre voyage d'été se fera en plein jour permanent.</p></div>
+        </article>
+        <article class="tile" data-cursor="Renne">
+          <img src="assets/img/renne.jpg" alt="Renne du Svalbard" loading="lazy">
+          <div><span class="mono">Unique au monde</span><h3>Le renne du Svalbard</h3><p>Petit et trapu, il ne vit nulle part ailleurs.</p></div>
+        </article>
+        <article class="tile" data-cursor="Sterne">
+          <img src="assets/img/sterne-arctique.jpg" alt="Sterne arctique en vol" loading="lazy">
+          <div><span class="mono">Grande voyageuse</span><h3>La sterne arctique</h3><p>Elle migre chaque année entre l'Arctique et l'Antarctique : le plus long voyage du monde animal.</p></div>
+        </article>
+        <article class="tile tile--wide-last" data-cursor="Traces">
+          <img src="assets/img/epaves-glace.jpg" alt="Épaves de véhicules prises dans la glace" loading="lazy">
+          <div><span class="mono">Traces humaines</span><h3>Même ici</h3><p>Anciennes mines, épaves, déchets : l'être humain a laissé sa marque jusqu'au Grand Nord.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ LE PROJET ============ -->
+    <section class="project" id="projet">
+      <p class="eyebrow mono">03 — Le projet</p>
+      <p class="statement" data-split>Nous sommes neuf étudiantes et étudiants du Collège du Sud, à Bulle, âgés de 16 à 18 ans. À l'été 2027, nous partirons deux semaines au Svalbard pour ramener <em>bien plus que des souvenirs</em>&nbsp;: des connaissances à partager.</p>
+
+      <div class="project__grid">
+        <figure class="project__img reveal-img" data-cursor="Svalbard">
+          <img src="assets/img/glacier-gimlebreen.jpg" alt="Front du glacier Gimlebreen, blocs de glace sur la plage" loading="lazy">
+          <figcaption class="mono">Front du glacier Gimlebreen, Nordaustlandet</figcaption>
+        </figure>
+        <div class="project__text">
+          <h3>Nos objectifs</h3>
+          <p>Sur place, encadrés par une glaciologue et climatologue, une experte arctique et des guides certifiés, nous marcherons, bivouaquerons et documenterons ce que nous observerons&nbsp;: glaciers, faune, végétation, pollution, cartographie, images.</p>
+          <p>À notre retour, nous partagerons nos découvertes avec notre école et notre région, grâce à des expositions, des conférences et un film documentaire.</p>
+          <p>Ce projet, nous le construisons nous-mêmes depuis octobre 2025&nbsp;: réunions, ventes de gâteaux, randonnées d'entraînement, recherche de soutiens.</p>
+          <p class="project__punch serif">Il ne manque plus que vous.</p>
+          <a href="#soutenir" class="btn btn--line magnetic"><span>Soutenir le voyage</span></a>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ BANDEAU ============ -->
+    <section class="band" aria-label="Deux semaines sur le terrain">
+      <div class="band__media"><img src="assets/img/tente-rouge.jpg" alt="Tente rouge plantée au bord d'un lac, montagnes du Svalbard" loading="lazy"></div>
+      <p class="band__text"><span class="mono">Deux semaines sur le terrain</span>Marcher, bivouaquer,<br><em>observer, documenter.</em></p>
+    </section>
+
+    <!-- ============ THÈMES (défilement horizontal) ============ -->
+    <section class="themes" id="themes">
+      <div class="themes__pin">
+        <div class="themes__intro">
+          <p class="eyebrow mono">04 — Sur le terrain</p>
+          <h2>Cinq regards<br><em class="serif">sur un même Arctique</em></h2>
+          <p>Chaque petit groupe prend en charge un thème, pour que le retour soit aussi riche que le voyage.</p>
+        </div>
+        <div class="themes__track">
+          <article class="theme" data-cursor="Faune">
+            <img src="assets/img/morse.jpg" alt="Morse en gros plan sur la glace" loading="lazy">
+            <div class="theme__body"><span class="mono">01</span><h3>Faune</h3><p>Traces, espèces observées, liens entre les animaux.</p><small class="mono">Nicolas · Fédor</small></div>
+          </article>
+          <article class="theme" data-cursor="Terrain">
+            <img src="assets/img/renne.jpg" alt="Renne du Svalbard" loading="lazy">
+            <div class="theme__body"><span class="mono">02</span><h3>Terrain &amp; plantes</h3><p>Comment la vie survit dans un environnement extrême, et comment le terrain change d'un endroit à l'autre.</p><small class="mono">Melissa</small></div>
+          </article>
+          <article class="theme" data-cursor="Climat">
+            <img src="assets/img/epaves-glace.jpg" alt="Épaves de véhicules prises dans la glace" loading="lazy">
+            <div class="theme__body"><span class="mono">03</span><h3>Pollution &amp; climat</h3><p>Météo, températures, déchets et impact humain, avec la scientifique Célia Julia Sapart.</p><small class="mono">Chloé</small></div>
+          </article>
+          <article class="theme" data-cursor="Film">
+            <img src="assets/img/bivouac-esmarkbreen.jpg" alt="Tente de bivouac devant le glacier Esmarkbreen" loading="lazy">
+            <div class="theme__body"><span class="mono">04</span><h3>Caméra &amp; témoignages</h3><p>Filmer le voyage, la vie en commun, et donner la parole aux gens rencontrés.</p><small class="mono">Salma · Amita</small></div>
+          </article>
+          <article class="theme" data-cursor="Carte">
+            <img src="assets/img/taniere.jpg" alt="Vue depuis une tanière d'ours polaire sur Nordaustlandet" loading="lazy">
+            <div class="theme__body"><span class="mono">05</span><h3>Journal de bord</h3><p>Cartographier chaque journée&nbsp;: tracé, distance, dénivelé, campements et observations clés.</p><small class="mono">Elise · Noah · Zora</small></div>
+          </article>
+          <article class="theme theme--end">
+            <div class="theme__body"><span class="mono">Au retour</span><h3 class="serif">Expositions, conférences &amp; film documentaire</h3><p>Pour faire voyager l'Arctique jusqu'en Gruyère.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ L'ÉQUIPE ============ -->
+    <section class="team" id="equipe">
+      <div class="team__bg" aria-hidden="true"><img src="assets/img/sterne-arctique.jpg" alt="" loading="lazy"></div>
+      <div class="team__head">
+        <p class="eyebrow mono">05 — L'équipe</p>
+        <h2>Neuf élèves,<br><em class="serif">un seul cap.</em></h2>
+        <p>Neuf étudiantes et étudiants du Collège du Sud, à Bulle, âgés de 16 à 18 ans. Chacun porte un thème sur le terrain.</p>
+      </div>
+      <ol class="team__list">
+        <li data-peek="assets/img/morse.jpg"><span class="mono">01</span><b>Fédor Naeher</b><em>Faune</em></li>
+        <li data-peek="assets/img/ours-nage.jpg"><span class="mono">02</span><b>Nicolas Balta</b><em>Faune</em></li>
+        <li data-peek="assets/img/taniere.jpg"><span class="mono">03</span><b>Noah Boulos</b><em>Journal de bord</em></li>
+        <li data-peek="assets/img/bivouac-esmarkbreen.jpg"><span class="mono">04</span><b>Salma Ottiger</b><em>Caméra &amp; témoignages</em></li>
+        <li data-peek="assets/img/tente-rouge.jpg"><span class="mono">05</span><b>Amita Gremaud</b><em>Caméra &amp; témoignages</em></li>
+        <li data-peek="assets/img/pierres-glace.jpg"><span class="mono">06</span><b>Elise Guerre</b><em>Journal de bord</em></li>
+        <li data-peek="assets/img/renne.jpg"><span class="mono">07</span><b>Melissa Cerdeira</b><em>Terrain &amp; plantes</em></li>
+        <li data-peek="assets/img/glacier-gimlebreen.jpg"><span class="mono">08</span><b>Zora Bindschedler</b><em>Journal de bord</em></li>
+        <li data-peek="assets/img/epaves-glace.jpg"><span class="mono">09</span><b>Chloé Esseiva</b><em>Pollution &amp; climat</em></li>
+      </ol>
+    </section>
+
+    <!-- ============ L'ENCADREMENT ============ -->
+    <section class="crew" id="encadrement">
+      <p class="eyebrow mono">06 — L'encadrement</p>
+      <h2 class="crew__title">Entourés <em class="serif">des meilleurs</em></h2>
+      <div class="crew__list">
+        <details class="crew__row" data-peek="assets/img/ours-polaire.jpg">
+          <summary><span class="crew__name">Daniel Rohrbasser</span><span class="crew__role mono">Initiateur &amp; accompagnateur</span><i></i></summary>
+          <p>Artiste et passionné arctique, membre fondateur de l'association «&nbsp;Une Trace à Part&nbsp;». Daniel a fait de nombreux voyages au Svalbard pour réaliser les tomes 1 et 2 du livre «&nbsp;Dans la trace des ours blancs&nbsp;».</p>
+        </details>
+        <details class="crew__row" data-peek="assets/img/ours-banquise.jpg">
+          <summary><span class="crew__name">Hilde Fålun Strøm</span><span class="crew__role mono">Experte arctique</span><i></i></summary>
+          <p>Elle vit au Svalbard depuis 30 ans. Ambassadrice polaire et scientifique, elle est un témoin exceptionnel de la transformation climatique de l'Arctique, et nous accompagnera dans nos découvertes en partageant ses expériences engagées sur le terrain.</p>
+        </details>
+        <details class="crew__row" data-peek="assets/img/bivouac-esmarkbreen.jpg">
+          <summary><span class="crew__name">Marcel Schütz</span><span class="crew__role mono">Guide certifié</span><i></i></summary>
+          <p>Guide certifié au Svalbard, où il vit depuis 2010. Marcel est responsable de la sécurité et de toute la logistique&nbsp;: alimentation, matériel de camping, transports en bateau et en voiture.</p>
+        </details>
+        <details class="crew__row" data-peek="assets/img/torrent.jpg">
+          <summary><span class="crew__name">Prof. Célia Julia Sapart</span><span class="crew__role mono">Climatologue &amp; glaciologue</span><i></i></summary>
+          <p>Chercheuse suisse, spécialiste des gaz à effet de serre, notamment du méthane. Célia nous accompagnera dans nos réflexions sur le climat et la pollution, vers une meilleure compréhension de ces mécanismes complexes.</p>
+        </details>
+        <details class="crew__row" data-peek="assets/img/glacier-gimlebreen.jpg">
+          <summary><span class="crew__name">Valentin Baeriswyl</span><span class="crew__role mono">Professeur, Collège du Sud</span><i></i></summary>
+          <p>Professeur de géographie et de sport au Collège du Sud, à Bulle.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ EN IMAGES ============ -->
+    <section class="gallery" id="images">
+      <div class="gallery__head">
+        <p class="eyebrow mono">07 — Le Svalbard en images</p>
+        <h2>Là où<br><em class="serif">tout fond plus vite</em></h2>
+      </div>
+      <div class="gallery__field">
+        <figure class="float f1" data-speed="-0.15" data-cursor="Agrandir"><img src="assets/img/glacier-gimlebreen.jpg" alt="Front du glacier Gimlebreen, au sud de Nordaustlandet" loading="lazy"><figcaption class="mono">Front du glacier Gimlebreen, Nordaustlandet</figcaption></figure>
+        <figure class="float f2" data-speed="0.12" data-cursor="Agrandir"><img src="assets/img/sterne-arctique.jpg" alt="Sterne arctique en vol dans un ciel bleu" loading="lazy"><figcaption class="mono">Sterne arctique</figcaption></figure>
+        <figure class="float f3" data-speed="-0.3" data-cursor="Agrandir"><img src="assets/img/ours-nage.jpg" alt="Ours polaire à la nage" loading="lazy"><figcaption class="mono">Ours polaire à la nage</figcaption></figure>
+        <figure class="float f4" data-speed="0.2" data-cursor="Agrandir"><img src="assets/img/renne.jpg" alt="Renne du Svalbard couché dans la neige" loading="lazy"><figcaption class="mono">Le renne du Svalbard, unique au monde</figcaption></figure>
+        <figure class="float f5" data-speed="-0.08" data-cursor="Agrandir"><img src="assets/img/taniere.jpg" alt="Vue depuis une tanière d'ours polaire sur Nordaustlandet" loading="lazy"><figcaption class="mono">Une tanière d'ours polaire, Nordaustlandet</figcaption></figure>
+        <figure class="float f6" data-speed="0.25" data-cursor="Agrandir"><img src="assets/img/ours-banquise.jpg" alt="Ours polaire sur la banquise d'été" loading="lazy"><figcaption class="mono">Ours polaire sur la banquise d'été</figcaption></figure>
+        <figure class="float f7" data-speed="-0.2" data-cursor="Agrandir"><img src="assets/img/pierres-glace.jpg" alt="Pierres posées sur la glace" loading="lazy"><figcaption class="mono">Pierres sur la glace</figcaption></figure>
+        <figure class="float f8" data-speed="0.1" data-cursor="Agrandir"><img src="assets/img/bivouac-esmarkbreen.jpg" alt="Tente de bivouac devant le glacier Esmarkbreen" loading="lazy"><figcaption class="mono">Bivouac au glacier Esmarkbreen, à 25 km de Longyearbyen</figcaption></figure>
+        <figure class="float f9" data-speed="-0.12" data-cursor="Agrandir"><img src="assets/img/torrent.jpg" alt="Torrent d'eau de fonte entre les rochers" loading="lazy"><figcaption class="mono">Eau de fonte</figcaption></figure>
+        <p class="gallery__quote serif">« L'Arctique mobilise souvent le meilleur de nous-même. »</p>
+      </div>
+      <p class="gallery__credit mono">Photos © Daniel Rohrbasser — <a href="https://artaventure.ch" target="_blank" rel="noopener">artaventure.ch</a></p>
+    </section>
+
+    <!-- ============ ILS NOUS SOUTIENNENT ============ -->
+    <section class="quotes" id="soutiens">
+      <div class="quotes__bg" aria-hidden="true"><img src="assets/img/ours-banquise.jpg" alt="" loading="lazy"></div>
+      <p class="eyebrow mono">08 — Ils nous soutiennent</p>
+      <div class="quotes__stage">
+        <blockquote class="quote is-active">
+          <p>«&nbsp;C'est exceptionnel que des adolescents, soutenus par leurs parents, mettent en commun leur passion pour la nature et s'organisent pour aller visiter le Grand Nord et y étudier de façon scientifique les différents thèmes qu'une telle démarche fait émerger.&nbsp;»</p>
+          <footer><b>Dominique de Buman</b><span class="mono">Ancien Conseiller national, Président du Conseil national 2017-2018</span></footer>
+        </blockquote>
+        <blockquote class="quote">
+          <p>«&nbsp;Je suis impressionné par l'énergie et l'enthousiasme des jeunes du Collège du Sud. Leur curiosité et leur engagement sont une source d'inspiration&nbsp;: ces jeunes nous montrent la voie.&nbsp;»</p>
+          <footer><b>Jacques Mauron</b><span class="mono">Ancien directeur général du Groupe E</span></footer>
+        </blockquote>
+        <blockquote class="quote">
+          <p>«&nbsp;L'Arctique mobilise souvent le meilleur de nous-même. C'est une école de Vie unique et inspirante pour des personnes attentives aux événements climatiques et environnementaux.&nbsp;»</p>
+          <footer><b>Daniel Rohrbasser</b><span class="mono">Artiste et passionné arctique — auteur de « Dans la trace des ours blancs »</span></footer>
+        </blockquote>
+      </div>
+      <div class="quotes__nav">
+        <button class="round magnetic" data-quote="-1" aria-label="Citation précédente">←</button>
+        <span class="mono"><span data-quote-index>01</span> / 03</span>
+        <button class="round magnetic" data-quote="1" aria-label="Citation suivante">→</button>
+      </div>
+    </section>
+
+    <!-- ============ NOUS SOUTENIR ============ -->
+    <section class="support" id="soutenir">
+      <div class="support__head">
+        <p class="eyebrow mono">09 — Nous soutenir</p>
+        <h2>Chaque contribution<br><em class="serif">nous rapproche du départ.</em></h2>
+        <p>Notre objectif&nbsp;: <strong>CHF 40'000</strong>. Ce montant couvre le voyage jusqu'à Longyearbyen, les guides certifiés (obligatoires au Svalbard), l'hébergement et le matériel de sécurité pour neuf étudiants et leurs accompagnants. Nous finançons déjà une partie du projet nous-mêmes&nbsp;: ventes diverses, petits travaux et économies personnelles.</p>
+      </div>
+
+      <figure class="support__media reveal-img"><img src="assets/img/bivouac-esmarkbreen.jpg" alt="Tente de bivouac devant le glacier Esmarkbreen" loading="lazy"><figcaption class="mono">Bivouac au glacier Esmarkbreen — chaque franc nous rapproche de ce paysage</figcaption></figure>
+
+      <div class="goal" data-goal>
+        <div class="goal__bar"><span></span></div>
+        <div class="goal__labels mono"><span data-goal-raised>Collecte en cours</span><span>Objectif CHF <b data-goal-total>40'000</b></span></div>
+      </div>
+
+      <div class="ways">
+        <article class="way">
+          <span class="mono">Particuliers, entreprises &amp; associations</span>
+          <h3>Faire un don</h3>
+          <p>Par virement bancaire ou par TWINT. Chaque franc compte, quel que soit le montant.</p>
+          <a href="#don" class="btn btn--accent magnetic"><span>Je fais un don</span></a>
+        </article>
+        <article class="way">
+          <span class="mono">Entreprises &amp; associations</span>
+          <h3>Devenons partenaires</h3>
+          <ul><li>un don financier, quel que soit le montant</li><li>du matériel d'expédition ou de l'équipement en prêt</li><li>des produits à revendre lors de nos ventes</li></ul>
+          <a href="#contact" class="btn btn--line magnetic" data-subject="partenariat"><span>Nous rencontrer</span></a>
+        </article>
+        <article class="way">
+          <span class="mono">Le livre</span>
+          <h3>« Dans la trace des ours blancs »</h3>
+          <p>Nous vendons quelques exemplaires du livre de Daniel Rohrbasser au profit de notre voyage d'étude.</p>
+          <a href="#contact" class="btn btn--line magnetic" data-subject="livre"><span>Commander un exemplaire</span></a>
+        </article>
+      </div>
+
+      <!-- Formulaire de don -->
+      <div class="donate" id="don">
+        <div class="donate__intro">
+          <h3>Faire un don</h3>
+          <p>Indiquez-nous votre don en quelques secondes&nbsp;: nous pourrons vous remercier personnellement et vous tenir au courant du voyage. Vous recevrez ensuite les coordonnées de paiement.</p>
+          <ol class="donate__steps mono"><li class="is-on">Montant</li><li>Vos infos</li><li>Paiement</li></ol>
+        </div>
+
+        <form class="donate__form" novalidate data-form="don">
+          <!-- étape 1 -->
+          <fieldset class="step is-on" data-step="1">
+            <legend class="mono">Je souhaite donner</legend>
+            <div class="chips">
+              <label><input type="radio" name="montant" value="50"><span>CHF 50</span></label>
+              <label><input type="radio" name="montant" value="100" checked><span>CHF 100</span></label>
+              <label><input type="radio" name="montant" value="250"><span>CHF 250</span></label>
+              <label><input type="radio" name="montant" value="500"><span>CHF 500</span></label>
+              <label class="chips__other"><input type="radio" name="montant" value="autre"><span>Autre</span></label>
+            </div>
+            <label class="field field--amount" hidden><span>Montant (CHF)</span><input type="number" name="montantLibre" min="5" step="5" inputmode="numeric" placeholder="ex. 75"></label>
+            <legend class="mono">Je donne en tant que</legend>
+            <div class="chips chips--small">
+              <label><input type="radio" name="type" value="Particulier" checked><span>Particulier</span></label>
+              <label><input type="radio" name="type" value="Entreprise"><span>Entreprise</span></label>
+              <label><input type="radio" name="type" value="Association"><span>Association</span></label>
+            </div>
+            <div class="step__actions"><button type="button" class="btn btn--accent magnetic" data-next><span>Continuer</span></button></div>
+          </fieldset>
+
+          <!-- étape 2 -->
+          <fieldset class="step" data-step="2">
+            <legend class="mono">Vos coordonnées</legend>
+            <div class="fields">
+              <label class="field"><span>Prénom *</span><input name="prenom" required autocomplete="given-name"></label>
+              <label class="field"><span>Nom *</span><input name="nom" required autocomplete="family-name"></label>
+              <label class="field field--wide" data-org hidden><span>Entreprise / association</span><input name="organisation" autocomplete="organization"></label>
+              <label class="field field--wide"><span>E-mail *</span><input type="email" name="email" required autocomplete="email"></label>
+              <label class="field field--wide"><span>Adresse (pour vous envoyer un remerciement, facultatif)</span><input name="adresse" autocomplete="street-address"></label>
+              <label class="field field--wide"><span>Un mot pour l'équipe ? (facultatif)</span><textarea name="message" rows="3"></textarea></label>
+            </div>
+            <label class="check"><input type="checkbox" name="public" value="oui"><span>J'accepte que mon nom apparaisse parmi nos soutiens (site, exposition).</span></label>
+            <label class="check"><input type="checkbox" name="nouvelles" value="oui" checked><span>Je souhaite recevoir des nouvelles du voyage.</span></label>
+            <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <p class="privacy mono">Vos données servent uniquement à vous remercier et à suivre les dons. Elles ne sont jamais partagées.</p>
+            <div class="step__actions">
+              <button type="button" class="btn btn--ghost" data-prev><span>Retour</span></button>
+              <button type="submit" class="btn btn--accent magnetic"><span>Valider mon don</span></button>
+            </div>
+            <p class="form__error mono" role="alert"></p>
+          </fieldset>
+
+          <!-- étape 3 -->
+          <fieldset class="step" data-step="3">
+            <legend class="mono">Merci <span data-thanks-name></span> ✳</legend>
+            <p class="pay__lead">Votre don de <strong data-thanks-amount></strong> est bien enregistré. Il ne reste qu'à effectuer le paiement&nbsp;:</p>
+            <div class="pay">
+              <div class="pay__card">
+                <span class="mono">Virement bancaire</span>
+                <div data-iban-block>
+                  <p class="pay__iban"><span data-iban></span><button type="button" class="copy mono" data-copy-iban>Copier</button></p>
+                  <p class="mono pay__holder" data-iban-holder></p>
+                </div>
+                <p class="pay__soon" data-iban-soon>Notre compte bancaire est en cours d'ouverture. Nous vous envoyons les coordonnées par e-mail dès qu'il est prêt.</p>
+                <p class="mono pay__ref">Communication&nbsp;: <b data-ref></b></p>
+              </div>
+              <div class="pay__card pay__card--twint">
+                <span class="mono">TWINT</span>
+                <img data-twint alt="QR code TWINT" hidden>
+                <div class="pay__qr-placeholder" data-twint-soon><span>QR TWINT</span><small>bientôt disponible</small></div>
+                <p class="mono">Scannez avec l'app TWINT</p>
+              </div>
+            </div>
+            <div class="step__actions"><button type="button" class="btn btn--ghost" data-restart><span>Faire un autre don</span></button></div>
+          </fieldset>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="contact" id="contact">
+      <div class="contact__left">
+        <p class="eyebrow mono">10 — Contact</p>
+        <h2>Une question&nbsp;?<br><em class="serif">Écrivez-nous.</em></h2>
+        <p>Partenariat, commande du livre, presse, ou simplement envie de nous encourager&nbsp;: nous venons volontiers vous présenter notre projet en personne.</p>
+        <figure class="contact__img reveal-img"><img src="assets/img/torrent.jpg" alt="Torrent d'eau de fonte" loading="lazy"></figure>
+        <div class="contact__mail">
+          <a class="contact__mail-link" data-email-link></a>
+          <button type="button" class="copy mono" data-copy-email>Copier</button>
+        </div>
+      </div>
+      <form class="contact__form" novalidate data-form="contact">
+        <div class="fields">
+          <label class="field"><span>Nom *</span><input name="nom" required autocomplete="name"></label>
+          <label class="field"><span>E-mail *</span><input type="email" name="email" required autocomplete="email"></label>
+          <label class="field field--wide"><span>Sujet</span>
+            <select name="sujet">
+              <option value="question">Une question</option>
+              <option value="partenariat">Devenir partenaire</option>
+              <option value="livre">Commander le livre « Dans la trace des ours blancs »</option>
+              <option value="presse">Presse / médias</option>
+              <option value="autre">Autre</option>
+            </select>
+          </label>
+          <label class="field field--wide"><span>Message *</span><textarea name="message" rows="5" required></textarea></label>
+        </div>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button type="submit" class="btn btn--accent btn--big magnetic"><span>Envoyer le message</span></button>
+        <p class="form__status mono" role="status"></p>
+      </form>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="footer__cta">
+      <a href="#soutenir" class="footer__big">Rejoignez<br><em class="serif">l'aventure</em> <span class="arrow">↗</span></a>
+    </div>
+    <div class="footer__grid">
+      <img class="footer__logo" src="assets/img/logo-encre.png" alt="Logo Des Alpes à l'Arctique">
+      <div><p class="mono">Association</p><p>Des Alpes à l'Arctique<br>Collège du Sud, Bulle</p></div>
+      <div><p class="mono">Contact</p><p><a data-email-link></a></p></div>
+      <div><p class="mono">Photos</p><p>© Daniel Rohrbasser<br><a href="https://artaventure.ch" target="_blank" rel="noopener">artaventure.ch</a></p></div>
+    </div>
+    <div class="footer__bottom mono"><span>© 2026 Des Alpes à l'Arctique</span><span>Voyage d'étude Svalbard 2027</span><a href="#accueil">Haut de page ↑</a></div>
+  </footer>
+
+  <!-- Lightbox -->
+  <div class="lightbox" aria-hidden="true"><img alt=""><p class="mono"></p><button class="round" aria-label="Fermer">✕</button></div>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-array@3/dist/d3-array.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-contour@4/dist/d3-contour.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-geo@3/dist/d3-geo.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
