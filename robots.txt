@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /
+# Aperçu privé : à remplacer par « Allow: / » au lancement officiel
