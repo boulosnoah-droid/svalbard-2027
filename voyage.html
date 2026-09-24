@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le voyage — Des Alpes à l'Arctique</title>
+  <meta name="description" content="De Bulle à Longyearbyen : le trajet, le programme et les cinq thèmes d'étude de notre voyage au Svalbard, été 2027.">
+  <meta name="theme-color" content="#081014">
+  <meta property="og:title" content="Le voyage — Des Alpes à l'Arctique">
+  <meta property="og:description" content="De Bulle à Longyearbyen : le trajet, le programme et les cinq thèmes d'étude de notre voyage au Svalbard, été 2027.">
+  <meta property="og:image" content="assets/img/fair-haven-soir.jpg">
+  <link rel="icon" href="assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=1790275169">
+  <script>document.documentElement.classList.add("js")</script>
+</head>
+<body data-page="voyage">
+  <div class="curtain" aria-hidden="true"><img src="assets/img/logo-blanc.png" alt=""></div>
+  <canvas class="topo" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div id="site-header"></div>
+  <main>
+    <section class="phero">
+      <div class="phero__media"><img src="assets/img/adventfjorden.jpg" alt="L'Adventfjorden gelé devant les montagnes enneigées du Svalbard" fetchpriority="high"></div>
+      <div class="phero__inner">
+        <p class="eyebrow">Le voyage · Été 2027</p>
+        <h1 class="phero__title"><span class="line"><span class="word">De Bulle</span></span><span class="line"><span class="word"><em>à 78°&nbsp;Nord</em></span></span></h1>
+        <p class="phero__lede">Deux semaines d'étude au Svalbard : un long trajet vers le nord, puis la marche, le bivouac et l'observation, encadrés par des spécialistes.</p>
+      </div>
+      <span class="phero__credit">Photo : Bernt Rostad · CC BY 2.0</span>
+    </section>
+
+    <section class="journey" id="trajet" aria-label="Le trajet, étape par étape">
+      <div class="journey__pin">
+        <div class="journey__panel">
+          <p class="eyebrow">Le trajet</p>
+          <h2 class="journey__lat no-anim"><span data-lat>46.6</span><sup>°N</sup></h2>
+          <p class="journey__km mono"><span data-km>0</span> km parcourus</p>
+          <ol class="journey__steps">
+            <li><i><svg viewBox="0 0 24 24"><path d="M7 3h10a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3l1.5 2.5h-2.3L14.8 18H9.2l-1.4 2.5H5.5L7 18a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zm-1 4v4h12V7zm2 7.5a1.3 1.3 0 1 0 0 .01zm8 0a1.3 1.3 0 1 0 0 .01z"/></svg></i><div><b>Train</b><span>Bulle → Zurich-Aéroport</span></div><small>≈ 2 h</small></li>
+            <li><i><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg></i><div><b>Avion</b><span>Zurich → Oslo</span></div><small>≈ 2 h 30</small></li>
+            <li><i><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg></i><div><b>Avion</b><span>Oslo → Tromsø</span></div><small>≈ 2 h</small></li>
+            <li><i><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg></i><div><b>Avion</b><span>Tromsø → Longyearbyen</span></div><small>≈ 1 h 30</small></li>
+            <li><i><svg viewBox="0 0 24 24"><path d="M3 15h18l-2.6 4.5H5.6zM11 3v10H4.5zM12.5 5.5l6 7.5h-6z"/></svg></i><div><b>Bateau</b><span>Isfjorden → glacier Esmarkbreen</span></div><small>≈ 25 km</small></li>
+          </ol>
+          <p class="journey__note">Trajet indicatif : les vols et l'itinéraire exacts seront confirmés plus tard.</p>
+        </div>
+        <svg class="globe" viewBox="0 0 800 800" role="img" aria-label="Globe montrant le trajet de Bulle au Svalbard">
+          <circle class="globe__sphere" cx="400" cy="400" r="380"/>
+          <path class="globe__grat"/><path class="globe__land"/><path class="globe__focus"/><path class="globe__sv"/><path class="globe__borders"/><path class="globe__polar"/>
+          <g class="globe__routes"></g><g class="globe__pts"></g><g class="globe__vehicle"></g>
+        </svg>
+      </div>
+    </section>
+
+    <section class="band" aria-label="Sur place">
+      <div class="band__media"><img src="assets/img/soleil-minuit-tentes.jpg" alt="Tentes sous le soleil de minuit au bord de l'Ekmanfjorden" loading="lazy"></div>
+      <p class="band__text"><span class="mono">Sur place</span>Marcher, bivouaquer,<br><em>observer, documenter.</em></p>
+      <span class="band__credit">Photo : Christoph Strässler · CC BY-SA 2.0</span>
+    </section>
+
+    <section class="objectives">
+      <p class="eyebrow">Nos objectifs</p>
+      <h2>Voir, comprendre,<br><em>partager</em></h2>
+      <div class="goals" data-stagger>
+        <div class="goalcard spot"><span class="mono">01 · Voir</span><h3>Le terrain</h3><p>Observer de nos yeux les glaciers, la faune et la végétation d'un des endroits où le climat change le plus vite.</p></div>
+        <div class="goalcard spot"><span class="mono">02 · Comprendre</span><h3>Avec des experts</h3><p>Apprendre auprès d'une climatologue, d'une experte arctique et de guides qui vivent au Svalbard.</p></div>
+        <div class="goalcard spot"><span class="mono">03 · Partager</span><h3>Au retour</h3><p>Ramener des connaissances pour notre école et notre région : expositions, conférences, film.</p></div>
+      </div>
+    </section>
+
+    <section class="themes" id="themes">
+      <div class="themes__pin">
+        <div class="themes__intro">
+          <p class="eyebrow">Sur le terrain</p>
+          <h2>Cinq regards<br><em>sur un même Arctique</em></h2>
+          <p>Chaque petit groupe prend en charge un thème, pour que le retour soit aussi riche que le voyage.</p>
+        </div>
+        <div class="themes__track">
+          <article class="theme spot"><img src="assets/img/morse.jpg" alt="Morse en gros plan sur la glace" loading="lazy"><div class="theme__body"><span class="mono">01</span><h3>Faune</h3><p>Traces, espèces observées, liens entre les animaux.</p><small class="mono">Nicolas · Fédor</small></div></article>
+          <article class="theme spot"><img src="assets/img/pavot-svalbard.jpg" alt="Pavots du Svalbard en fleur entre les pierres" loading="lazy"><div class="theme__body"><span class="mono">02</span><h3>Terrain &amp; plantes</h3><p>Comment la vie survit dans un environnement extrême, et comment le terrain change d'un endroit à l'autre.</p><small class="mono">Melissa</small></div></article>
+          <article class="theme spot"><img src="assets/img/epaves-glace.jpg" alt="Épaves de véhicules prises dans la glace" loading="lazy"><div class="theme__body"><span class="mono">03</span><h3>Pollution &amp; climat</h3><p>Météo, températures, déchets et impact humain, avec la scientifique Célia Julia Sapart.</p><small class="mono">Chloé</small></div></article>
+          <article class="theme spot"><img src="assets/img/nordenskiold-marcheurs.jpg" alt="Randonneurs sur le glacier Nordenskiöld" loading="lazy"><div class="theme__body"><span class="mono">04</span><h3>Caméra &amp; témoignages</h3><p>Filmer le voyage, la vie en commun, et donner la parole aux gens rencontrés.</p><small class="mono">Salma · Amita</small></div></article>
+          <article class="theme spot"><img src="assets/img/taniere.jpg" alt="Vue depuis une tanière d'ours polaire sur Nordaustlandet" loading="lazy"><div class="theme__body"><span class="mono">05</span><h3>Journal de bord</h3><p>Cartographier chaque journée : tracé, distance, dénivelé, campements et observations clés.</p><small class="mono">Elise · Noah · Zora</small></div></article>
+          <article class="theme theme--end"><div class="theme__body"><span class="mono">Au retour</span><h3>Faire voyager l'Arctique jusqu'en Gruyère</h3><p>Tout ce que nous observerons sera partagé.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="aftersec">
+      <p class="eyebrow">Au retour</p>
+      <h2>Ce que nous<br><em>ramènerons</em></h2>
+      <div class="after" data-stagger>
+        <div><b>Exposition</b><p>Photos, cartes et observations de chaque groupe, présentées au Collège du Sud et dans la région.</p></div>
+        <div><b>Conférences</b><p>Raconter le voyage et ce que nous aurons appris sur le climat, pour sensibiliser notre génération.</p></div>
+        <div><b>Film</b><p>Un documentaire tourné sur place : l'histoire du voyage, de notre point de vue.</p></div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div><p class="eyebrow">Et maintenant&nbsp;?</p><h2>Aidez-nous<br><em>à partir</em></h2></div>
+      <div><p>Notre objectif est de réunir CHF 40'000 pour le voyage, les guides, l'hébergement et le matériel de sécurité.</p>
+        <div class="cta__btns"><button class="btn btn--accent magnetic" data-open="don"><span>Faire un don</span></button><a href="svalbard.html" class="btn btn--line"><span>Découvrir le Svalbard</span></a></div></div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <div class="lightbox" aria-hidden="true"><img alt=""><p></p><button class="round" aria-label="Fermer">✕</button></div>
+
+  <script src="js/config.js?v=1790275169"></script>
+  <script src="js/layout.js?v=1790275169"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-array@3/dist/d3-array.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-contour@4/dist/d3-contour.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-geo@3/dist/d3-geo.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script src="js/globe.js?v={V}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="js/pay.js?v=1790275169"></script>
+  <script src="js/main.js?v=1790275169"></script>
+</body>
+</html>

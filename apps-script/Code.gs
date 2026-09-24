@@ -14,12 +14,13 @@
 const EQUIPE_EMAIL = "svalbardcsud@gmail.com";
 const MERCI_AUTOMATIQUE = true;     // e-mail de remerciement automatique au donateur
 const IBAN = "";                    // à remplir quand le compte existe (repris dans l'e-mail de remerciement)
+// Rappel : les dons sont des promesses ; on coche « Payé ? » quand l'argent arrive (TWINT ou banque).
 const TITULAIRE = "Association Des Alpes à l'Arctique";
 
 const COLONNES = {
-  Dons: ["Date", "Montant (CHF)", "Type", "Prénom", "Nom", "Organisation", "E-mail", "Adresse",
-         "Message", "Nom public ?", "Nouvelles ?", "Référence", "Payé ?", "Remercié ?"],
-  Messages: ["Date", "Nom", "E-mail", "Sujet", "Message", "Traité ?"],
+  Dons: ["Date", "Montant (CHF)", "Type", "Prénom", "Nom", "Organisation", "E-mail",
+         "Message", "Nom public ?", "Référence", "Payé ?", "Remercié ?"],
+  Messages: ["Date", "Type", "Nom", "E-mail", "Organisation", "Téléphone", "Détails", "Message", "Traité ?"],
 };
 
 function doPost(e) {
@@ -32,7 +33,7 @@ function doPost(e) {
 
     if (d.kind === "don") {
       feuille_("Dons").appendRow([date, Number(d.montant) || "", d.type, d.prenom, d.nom, d.organisation,
-        d.email, d.adresse, d.message, d.nomPublic, d.nouvelles, d.reference, "non", "non"]);
+        d.email, d.message, d.nomPublic, d.reference, "non", "non"]);
 
       MailApp.sendEmail({
         to: EQUIPE_EMAIL,
@@ -53,17 +54,23 @@ function doPost(e) {
           name: "Des Alpes à l'Arctique",
           subject: "Merci pour votre soutien ✳ Des Alpes à l'Arctique",
           body: `Bonjour ${d.prenom},\n\nUn immense merci pour votre soutien de CHF ${d.montant} à notre voyage d'étude au Svalbard !\n\n` +
-                `${paiement}\n\nNous vous tiendrons au courant de nos préparatifs et de notre voyage.\n\n` +
+                `${paiement}\n\nMerci de nous aider à partir !\n\n` +
                 `Les neuf élèves du Collège du Sud\nDes Alpes à l'Arctique — Svalbard 2027`,
         });
       }
     } else {
-      feuille_("Messages").appendRow([date, d.nom, d.email, d.sujet, d.message, "non"]);
+      // contact, partenariat ou réservation du livre
+      const type = { contact: "Contact", partenariat: "Partenariat", livre: "Livre" }[d.kind] || d.kind;
+      const details = d.kind === "livre" ? `${d.quantite || 1} exemplaire(s) · ${d.remise || ""} ${d.adresse ? "· " + d.adresse : ""}`
+        : d.kind === "partenariat" ? (d.soutien || "") : (d.sujet || "");
+      feuille_("Messages").appendRow([date, type, d.nom, d.email, d.organisation || "", d.telephone || "", details, d.message || "", "non"]);
       MailApp.sendEmail({
         to: EQUIPE_EMAIL,
         replyTo: d.email,
-        subject: `[Site] ${d.sujet} — ${d.nom}`,
-        body: `${d.nom} (${d.email}) a écrit via le site :\n\n${d.message}\n\n(Répondre à cet e-mail répond directement à ${d.nom}.)`,
+        subject: `[Site] ${type} — ${d.organisation ? d.organisation + " / " : ""}${d.nom}`,
+        body: `${type} via le site\n\nNom : ${d.nom}\nE-mail : ${d.email}\n` +
+              (d.organisation ? `Organisation : ${d.organisation}\n` : "") + (d.telephone ? `Téléphone : ${d.telephone}\n` : "") +
+              (details ? `Détails : ${details}\n` : "") + `\n${d.message || ""}\n\n(Répondre à cet e-mail répond directement à ${d.nom}.)`,
       });
     }
     return ok_();
@@ -76,7 +83,7 @@ function doPost(e) {
 function testerUnDon() {
   doPost({ postData: { contents: JSON.stringify({
     kind: "don", montant: 1, type: "Particulier", prenom: "Test", nom: "Essai", email: EQUIPE_EMAIL,
-    reference: "SVALBARD TE 0000", nomPublic: "non", nouvelles: "non",
+    reference: "Don Svalbard 2027 – Test Essai", nomPublic: "non",
   }) } });
 }
 
