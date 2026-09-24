@@ -20,6 +20,7 @@ function Sheet(name) {
     return {
       getValues: () => [self.rows[row - 1].slice(col - 1, col - 1 + nc)],
       setValue: (v) => { self.rows[row - 1][col - 1] = v; },
+      setValues(v) { v.forEach((r, i) => { self.rows[row - 1 + i] = self.rows[row - 1 + i] || []; r.forEach((x, j) => (self.rows[row - 1 + i][col - 1 + j] = x)); }); return this; },
       setFontWeight() { return this; },
       getRow: () => row, getColumn: () => col, getSheet: () => self,
     };
@@ -46,9 +47,11 @@ ctx.installer();
 assert(sheets.Dons && sheets.Messages && sheets["Tableau de bord"], "onglets créés");
 assert.deepStrictEqual(triggers, ["surModification"], "déclencheur installé");
 // 2) un don anonyme + un don avec nom
-assert(post({ kind: "don", montant: 100, type: "Particulier", prenom: "Léa", nom: "Exemple", email: "lea@example.com", reference: "Don Svalbard 2027 – Léa Exemple", nomPublic: "non" }).ok);
+assert(post({ kind: "don", montant: 100, type: "Particulier", prenom: "Léa", nom: "Exemple", email: "lea@example.com", reference: "Don Svalbard 2027 – Léa Exemple", nomPublic: "non", methode: "TWINT" }).ok);
 assert(post({ kind: "don", montant: 250, type: "Entreprise", prenom: "Marc", nom: "Test", organisation: "=HACK()", email: "marc@example.com", reference: "Don Svalbard 2027 – Marc Test", nomPublic: "oui" }).ok);
 assert.strictEqual(sheets.Dons.rows.length, 3, "2 dons enregistrés");
+assert.strictEqual(sheets.Dons.rows[1][13], "TWINT", "moyen de paiement enregistré");
+assert(/\(TWINT\)/.test(mails[0].subject), "moyen dans le sujet équipe");
 assert.strictEqual(sheets.Dons.rows[2][5], "'=HACK()", "formule neutralisée");
 assert.strictEqual(mails.length, 4, "2 mails équipe + 2 mails donateurs");
 assert(mails[1].to === "lea@example.com" && /compte est en cours d'ouverture/.test(mails[1].body), "confirmation donateur");

@@ -543,7 +543,15 @@ sup.ast { color: var(--accent); font-family: var(--sans); font-style: normal; fo
 .pay__qr .qr { width: 100%; height: auto; display: block; }
 .pay__hint { font-size: 13px; color: var(--mist) !important; margin-top: 12px !important; }
 .pay__hint b { color: var(--ice); }
-.pay__mail { font-size: 13px; color: var(--accent); margin: 14px 0 0; min-height: 1em; }
+.pay__note { font-size: 13px; color: var(--mist); margin: 18px 0 0; }
+.step--done { text-align: center; padding: 12px 0 4px; }
+.step--done.is-on { display: flex; flex-direction: column; align-items: center; }
+.step--done h3 { font-size: clamp(28px, 4vw, 40px); margin: 18px 0 10px; text-transform: uppercase; letter-spacing: -.02em; line-height: 1; }
+.step--done p { color: var(--ice-dim); margin: 0 0 12px; max-width: 460px; }
+.step--done b { color: var(--ice); }
+.done__mail { background: rgba(158,234,255,.1); border: 1px solid rgba(158,234,255,.35); border-radius: 14px; padding: 16px 18px; color: var(--ice) !important; }
+.done__hint { font-size: 13px; color: var(--mist) !important; }
+.step--done .btn { margin-top: 12px; min-width: 200px; }
 .pay__soon { border: 1px dashed var(--mist); border-radius: 14px; padding: 22px; }
 .pay__soon span { font: 12px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--warm); }
 .pay__soon p { margin: 8px 0 0; color: var(--ice-dim); }

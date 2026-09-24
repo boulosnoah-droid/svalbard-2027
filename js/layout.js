@@ -167,14 +167,14 @@
         <p class="privacy">Votre nom et votre e-mail ne sont vus que par l'équipe, pour vous remercier et suivre les dons. Ils ne sont jamais partagés.</p>
         <div class="step__actions">
           <button type="button" class="btn btn--ghost" data-prev><span>Retour</span></button>
-          <button type="submit" class="btn btn--accent"><span>Passer au paiement</span></button>
+          <button type="submit" class="btn btn--accent"><span>Choisir le paiement</span></button>
         </div>
         <p class="form__status" role="status"></p>
       </fieldset>
 
       <fieldset class="step" data-step="3">
         <legend class="sr">Paiement</legend>
-        <p class="pay__lead">Merci <b data-thanks-name></b> ! Choisissez comment verser votre don de <b data-thanks-amount></b>&nbsp;:</p>
+        <p class="pay__lead">Merci <b data-thanks-name></b> ! Comment souhaitez-vous verser votre don de <b data-thanks-amount></b>&nbsp;?</p>
         <div class="tabs" role="tablist">
           <button type="button" role="tab" class="tab is-on" data-tab="twint">TWINT</button>
           <button type="button" role="tab" class="tab" data-tab="virement">Virement</button>
@@ -183,11 +183,22 @@
         <div class="panel is-on" data-panel="twint"></div>
         <div class="panel" data-panel="virement"></div>
         <div class="panel" data-panel="carte"></div>
-        <p class="pay__mail" data-pay-mail></p>
+        <p class="pay__note">En cliquant sur « Terminer mon don », vous recevez par e-mail un récapitulatif avec toutes les informations pour payer, maintenant ou plus tard.</p>
         <div class="step__actions">
           <button type="button" class="btn btn--ghost" data-prev><span>Modifier</span></button>
-          <button type="button" class="btn btn--accent" data-close><span>Terminé</span></button>
+          <button type="button" class="btn btn--accent" data-finish><span>Terminer mon don</span></button>
         </div>
+        <p class="form__status" role="status"></p>
+      </fieldset>
+
+      <fieldset class="step step--done" data-step="4">
+        <legend class="sr">Don enregistré</legend>
+        <span class="modal__check">✓</span>
+        <h3>Merci <span data-done-name></span>&nbsp;!</h3>
+        <p>Votre don de <b data-done-amount></b> par <b data-done-method></b> est bien enregistré.</p>
+        <p class="done__mail">📩 Nous vous avons envoyé un e-mail à <b data-done-email></b> avec toutes les informations pour finaliser votre don.</p>
+        <p class="done__hint">Vous ne le voyez pas&nbsp;? Pensez à regarder dans vos courriers indésirables.</p>
+        <button type="button" class="btn btn--accent" data-close><span>Fermer</span></button>
       </fieldset>
     </form>
   </dialog>`;

@@ -5,9 +5,9 @@
  * (menu Extensions → Apps Script). Mode d'emploi : README.md, « Brancher les formulaires ».
  *
  * Ce qu'il fait tout seul :
- *   • chaque don annoncé sur le site  → une ligne dans l'onglet « Dons »
+ *   • chaque don terminé sur le site (après le choix TWINT / virement) → une ligne dans l'onglet « Dons »
  *                                      + un e-mail à l'équipe
- *                                      + un e-mail de confirmation au donateur (avec IBAN / TWINT)
+ *                                      + un e-mail au donateur avec les infos du moyen de paiement choisi
  *   • chaque message (contact, partenariat, livre) → une ligne dans « Messages » + un e-mail à l'équipe
  *                                      (répondre à cet e-mail répond directement à la personne)
  *   • quand vous mettez « Payé ? » sur « oui » → un e-mail « paiement bien reçu, merci » au donateur
@@ -28,7 +28,7 @@ const SIGNATURE = "Les neuf élèves du Collège du Sud\nDes Alpes à l'Arctique
 
 const COLONNES = {
   Dons: ["Date", "Montant (CHF)", "Type", "Prénom", "Nom", "Organisation", "E-mail", "Message",
-         "Nom affiché ?", "Communication", "Payé ?", "Date du paiement", "Merci envoyé ?"],
+         "Nom affiché ?", "Communication", "Payé ?", "Date du paiement", "Merci envoyé ?", "Moyen de paiement"],
   Messages: ["Date", "Type", "Nom", "E-mail", "Organisation", "Téléphone", "Détails", "Message", "Traité ?"],
 };
 const COL = { montant: 2, prenom: 4, email: 7, affiche: 9, ref: 10, paye: 11, datePaye: 12, merci: 13 };
@@ -38,7 +38,9 @@ const COL = { montant: 2, prenom: 4, email: 7, affiche: 9, ref: 10, paye: 11, da
    ===================================================================== */
 function installer() {
   const ss = classeur_();
-  feuille_("Dons"); feuille_("Messages");
+  ["Dons", "Messages"].forEach((n) => { // (ré)écrit les titres des colonnes, y compris les nouvelles
+    feuille_(n).getRange(1, 1, 1, COLONNES[n].length).setValues([COLONNES[n]]).setFontWeight("bold");
+  });
   const oui = SpreadsheetApp.newDataValidation().requireValueInList(["non", "oui"], true).build();
   feuille_("Dons").getRange("K2:K").setDataValidation(oui);
   feuille_("Dons").getRange("M2:M").setDataValidation(oui);
@@ -87,15 +89,15 @@ function doPost(e) {
       const montant = Math.max(0, Math.min(100000, Number(d.montant) || 0));
       const nomAffiche = d.nomPublic === "oui" ? "oui" : "non";
       feuille_("Dons").appendRow([date, montant, t_(d.type), t_(d.prenom), t_(d.nom), t_(d.organisation), t_(d.email),
-        t_(d.message), nomAffiche, t_(d.reference), "non", "", "non"]);
+        t_(d.message), nomAffiche, t_(d.reference), "non", "", "non", t_(d.methode)]);
       majTableau_();
 
       MailApp.sendEmail({
         to: EQUIPE_EMAIL,
         replyTo: d.email,
-        subject: `Nouveau don annoncé : CHF ${montant} — ${d.prenom} ${d.nom}`,
+        subject: `Nouveau don : CHF ${montant} — ${d.prenom} ${d.nom} (${d.methode || "?"})`,
         body: `${d.prenom} ${d.nom}${d.organisation ? " (" + d.organisation + ")" : ""} annonce un don de CHF ${montant}.\n\n` +
-              `E-mail : ${d.email}\nType : ${d.type}\nCommunication de paiement : ${d.reference}\n` +
+              `E-mail : ${d.email}\nType : ${d.type}\nMoyen de paiement choisi : ${d.methode || "—"}\nCommunication de paiement : ${d.reference}\n` +
               `Nom affiché sur le site : ${nomAffiche}\nMessage : ${d.message || "—"}\n\n` +
               `Quand l'argent arrive (TWINT ou banque), mets « Payé ? » sur « oui » dans la feuille :\n` +
               `le donateur reçoit alors automatiquement un e-mail de remerciement.\n${classeur_().getUrl()}`,
@@ -105,9 +107,9 @@ function doPost(e) {
         to: d.email,
         replyTo: EQUIPE_EMAIL,
         name: "Des Alpes à l'Arctique",
-        subject: "Merci pour votre soutien ✳ Des Alpes à l'Arctique",
+        subject: "Votre don pour le Svalbard : les informations pour finaliser ✳ Des Alpes à l'Arctique",
         body: `Bonjour ${d.prenom},\n\nUn immense merci pour votre don de CHF ${montant} à notre voyage d'étude au Svalbard !\n\n` +
-              paiement_(d.reference, montant) +
+              paiement_(d.reference, montant, d.methode) +
               `\n\nDès que votre paiement nous parvient, nous vous envoyons une confirmation.\n\n${SIGNATURE}`,
       });
     } else {
@@ -189,7 +191,7 @@ function majTableau_(ecrire = true) {
 function testerUnDon() {
   doPost({ postData: { contents: JSON.stringify({
     kind: "don", montant: 1, type: "Particulier", prenom: "Test", nom: "Essai", email: EQUIPE_EMAIL,
-    reference: "Don Svalbard 2027 – Test Essai", nomPublic: "non",
+    reference: "Don Svalbard 2027 – Test Essai", nomPublic: "non", methode: "TWINT",
   }) } });
 }
 function testerUnMessage() {
@@ -202,11 +204,14 @@ function classeur_() {
   if (!ss) throw new Error("Remplissez ID_FEUILLE en haut du script (identifiant de la feuille Google Sheets).");
   return ss;
 }
-function paiement_(ref, montant) {
-  const l = [];
-  if (LIEN_TWINT) l.push(`• Par TWINT : ${LIEN_TWINT}\n  (montant : CHF ${montant})`);
-  if (IBAN) l.push(`• Par virement :\n  IBAN : ${IBAN}\n  Titulaire : ${TITULAIRE}\n  Montant : CHF ${montant}\n  Communication : ${ref}`);
-  return l.length ? "Pour effectuer votre paiement :\n\n" + l.join("\n\n")
+function paiement_(ref, montant, methode) {
+  const twint = LIEN_TWINT && `Par TWINT : ${LIEN_TWINT}\n(montant : CHF ${montant})`;
+  const virement = IBAN && `Par virement bancaire :\nIBAN : ${IBAN}\nTitulaire : ${TITULAIRE}\nMontant : CHF ${montant}\nCommunication : ${ref}`;
+  const choisi = /twint/i.test(methode || "") ? twint : /virement/i.test(methode || "") ? virement : null;
+  if (choisi) return "Pour finaliser votre don :\n\n" + choisi +
+    ((/twint/i.test(methode) ? virement : twint) ? "\n\nVous préférez l'autre moyen ?\n\n" + (/twint/i.test(methode) ? virement : twint) : "");
+  const l = [twint, virement].filter(Boolean);
+  return l.length ? "Pour finaliser votre don :\n\n" + l.join("\n\n")
     : "Notre compte est en cours d'ouverture : nous vous envoyons les coordonnées de paiement très bientôt.";
 }
 function feuille_(nom) {
