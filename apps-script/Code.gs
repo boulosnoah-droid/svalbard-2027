@@ -18,7 +18,7 @@
 // ---------- Réglages ----------
 // Identifiant de la feuille Google Sheets (le long code entre /d/ et /edit dans son adresse).
 // Nécessaire si le script a été créé depuis script.google.com (et non via Extensions → Apps Script).
-const ID_FEUILLE = "";
+const ID_FEUILLE = "1UD5Vt2jzG6nsdXw2XRJv63WZCDw-a3e3Y3qUJHskf7k";
 const EQUIPE_EMAIL = "svalbardcsud@gmail.com";
 const IBAN = "";               // ex. "CH12 3456 7890 1234 5678 9"
 const TITULAIRE = "Association Des Alpes à l'Arctique";
