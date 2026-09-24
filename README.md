@@ -60,6 +60,8 @@ Le site ne peut pas savoir tout seul qu'un virement est arrivé : aucune banque 
 
 **Qui peut voir les dons ?** Seules les personnes qui ont accès à la feuille (le compte svalbardcsud, plus ceux avec qui vous la partagez via le bouton *Partager*). Onglet « Dons » : qui, combien, quand, payé ou pas. Onglet « Messages » : contacts, partenariats, réservations du livre. Les e-mails arrivent aussi dans la boîte svalbardcsud@gmail.com.
 
+**Plusieurs comptes Google connectés dans Chrome ?** « Extensions → Apps Script » peut alors afficher « Impossible d'ouvrir le fichier ». Solution sans se déconnecter : ouvrir `https://script.google.com/home?authuser=N` (N = le numéro du compte, visible dans l'adresse du tableau : `.../spreadsheets/u/N/...`), vérifier l'avatar en haut à droite, cliquer sur **Nouveau projet**, coller le script et remplir `ID_FEUILLE` (le code entre `/d/` et `/edit` dans l'adresse du tableau). La suite est identique.
+
 **Modifier le script plus tard** (par exemple pour ajouter l'IBAN) : le modifier dans Apps Script, puis *Déployer → Gérer les déploiements → ✏️ → Version : Nouvelle version → Déployer*. L'URL ne change pas.
 
 **Tester le script sans Google** : `node apps-script/test.js apps-script/Code.gs`.

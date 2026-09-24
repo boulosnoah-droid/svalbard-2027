@@ -27,15 +27,15 @@ function Sheet(name) {
   this.getDataRange = () => ({ getValues: () => self.rows.map((r) => r.slice()) });
   this.setColumnWidth = () => {};
 }
-const ss = { getSheetByName: (n) => sheets[n] || null, insertSheet: (n) => (sheets[n] = new Sheet(n)), getUrl: () => "https://docs.google.com/spreadsheets/d/TEST", toast: () => {} };
+const ss = { openById: null, getSheetByName: (n) => sheets[n] || null, insertSheet: (n) => (sheets[n] = new Sheet(n)), getUrl: () => "https://docs.google.com/spreadsheets/d/TEST", toast: () => {} };
 const ctx = {
-  SpreadsheetApp: { getActiveSpreadsheet: () => ss, getActive: () => ss, newDataValidation: () => ({ requireValueInList() { return this; }, build() { return {}; } }) },
+  SpreadsheetApp: { openById: () => ss, getActiveSpreadsheet: () => ss, getActive: () => ss, newDataValidation: () => ({ requireValueInList() { return this; }, build() { return {}; } }) },
   MailApp: { sendEmail: (m) => mails.push(m) },
   LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
   CacheService: { getScriptCache: () => ({ get: (k) => cache[k], put: (k, v) => (cache[k] = v) }) },
   ContentService: { createTextOutput: (s) => ({ s, setMimeType() { return this; } }), MimeType: { JSON: "json" } },
   ScriptApp: { getProjectTriggers: () => triggers.slice(), deleteTrigger() {}, newTrigger: (fn) => ({ forSpreadsheet() { return this; }, onEdit() { return this; }, create() { triggers.push(fn); } }) },
-  console,
+  console, Logger: { log() {} },
 };
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), ctx);

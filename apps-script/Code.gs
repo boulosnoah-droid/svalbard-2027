@@ -15,7 +15,10 @@
  *     et affiche le prénom des donateurs qui ont choisi « Avec mon nom » (les autres restent anonymes).
  */
 
-// ---------- Réglages (à remplir une fois le compte ouvert) ----------
+// ---------- Réglages ----------
+// Identifiant de la feuille Google Sheets (le long code entre /d/ et /edit dans son adresse).
+// Nécessaire si le script a été créé depuis script.google.com (et non via Extensions → Apps Script).
+const ID_FEUILLE = "";
 const EQUIPE_EMAIL = "svalbardcsud@gmail.com";
 const IBAN = "";               // ex. "CH12 3456 7890 1234 5678 9"
 const TITULAIRE = "Association Des Alpes à l'Arctique";
@@ -34,7 +37,7 @@ const COL = { montant: 2, prenom: 4, email: 7, affiche: 9, ref: 10, paye: 11, da
    1) À lancer UNE FOIS après avoir collé le script : prépare tout.
    ===================================================================== */
 function installer() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = classeur_();
   feuille_("Dons"); feuille_("Messages");
   const oui = SpreadsheetApp.newDataValidation().requireValueInList(["non", "oui"], true).build();
   feuille_("Dons").getRange("K2:K").setDataValidation(oui);
@@ -65,7 +68,7 @@ function installer() {
   // e-mail « paiement reçu » automatique quand on coche « Payé ? »
   ScriptApp.getProjectTriggers().forEach((t) => ScriptApp.deleteTrigger(t));
   ScriptApp.newTrigger("surModification").forSpreadsheet(ss).onEdit().create();
-  ss.toast("Installation terminée ✓");
+  Logger.log("Installation terminée ✓ — onglets créés dans : " + ss.getUrl());
 }
 
 /* =====================================================================
@@ -94,7 +97,7 @@ function doPost(e) {
               `E-mail : ${d.email}\nType : ${d.type}\nCommunication de paiement : ${d.reference}\n` +
               `Nom affiché sur le site : ${nomAffiche}\nMessage : ${d.message || "—"}\n\n` +
               `Quand l'argent arrive (TWINT ou banque), mets « Payé ? » sur « oui » dans la feuille :\n` +
-              `le donateur reçoit alors automatiquement un e-mail de remerciement.\n${SpreadsheetApp.getActiveSpreadsheet().getUrl()}`,
+              `le donateur reçoit alors automatiquement un e-mail de remerciement.\n${classeur_().getUrl()}`,
       });
 
       MailApp.sendEmail({
@@ -130,7 +133,7 @@ function doPost(e) {
    3) Chiffres lus par le site (GET) : total réuni + prénoms publics
    ===================================================================== */
 function doGet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = classeur_();
   const tb = ss.getSheetByName("Tableau de bord");
   const total = tb ? Number(tb.getRange("B7").getValue()) || 0 : 0;
   const rows = feuille_("Dons").getDataRange().getValues().slice(1);
@@ -172,6 +175,11 @@ function testerUnMessage() {
 }
 
 /* ---------- outils ---------- */
+function classeur_() {
+  const ss = ID_FEUILLE ? SpreadsheetApp.openById(ID_FEUILLE) : SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss) throw new Error("Remplissez ID_FEUILLE en haut du script (identifiant de la feuille Google Sheets).");
+  return ss;
+}
 function paiement_(ref, montant) {
   const l = [];
   if (LIEN_TWINT) l.push(`• Par TWINT : ${LIEN_TWINT}\n  (montant : CHF ${montant})`);
@@ -180,7 +188,7 @@ function paiement_(ref, montant) {
     : "Notre compte est en cours d'ouverture : nous vous envoyons les coordonnées de paiement très bientôt.";
 }
 function feuille_(nom) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = classeur_();
   let sh = ss.getSheetByName(nom);
   if (!sh) {
     sh = ss.insertSheet(nom);
