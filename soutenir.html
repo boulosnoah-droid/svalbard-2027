@@ -13,14 +13,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=1790275169">
-  <script>document.documentElement.classList.add("js")</script>
+  <link rel="stylesheet" href="css/style.css?v=1790277311">
+  <script type="speculationrules">{"prefetch":[{"source":"list","urls":["index.html","voyage.html","svalbard.html","equipe.html","soutenir.html"],"eagerness":"eager"}],"prerender":[{"source":"document","where":{"selector_matches":"a[href$='.html']"},"eagerness":"moderate"}]}</script>
 </head>
 <body data-page="soutenir">
-  <div class="curtain" aria-hidden="true"><img src="assets/img/logo-blanc.png" alt=""></div>
+  <script src="js/config.js?v=1790277311"></script>
+  <script src="js/layout.js?v=1790277311"></script>
   <canvas class="topo" aria-hidden="true"></canvas>
   <div class="grain" aria-hidden="true"></div>
-  <div id="site-header"></div>
   <main>
     <section class="phero">
       <div class="phero__media"><img src="assets/img/bivouac-esmarkbreen.jpg" alt="Tente de bivouac devant le glacier Esmarkbreen" fetchpriority="high"></div>
@@ -41,12 +41,13 @@
         <div class="goal__bar"><span></span></div>
         <div class="goal__labels mono"><span data-goal-raised>Collecte en cours</span><span>Objectif CHF <b data-goal-total>40'000</b></span></div>
       </div>
+      <div class="donors" data-donors hidden><p class="mono">Merci à celles et ceux qui nous soutiennent déjà</p><ul data-donors-list></ul></div>
 
       <div class="ways" data-stagger>
         <article class="way way--main spot">
           <span class="mono">Particuliers, entreprises &amp; associations</span>
           <h3>Faire un don</h3>
-          <p>En quelques secondes, par TWINT, depuis l'app de votre banque ou par virement. Chaque contribution, petite ou grande, nous rapproche du départ.</p>
+          <p>En quelques secondes, par TWINT ou par virement. Chaque contribution, petite ou grande, nous rapproche du départ.</p>
           <button class="btn btn--accent magnetic" data-open="don"><span>Je fais un don</span></button>
         </article>
         <article class="way spot">
@@ -64,7 +65,7 @@
       </div>
     </section>
 
-    <section class="budgetsec">
+    <section class="budgetsec" id="budget">
       <p class="eyebrow">Où va votre argent</p>
       <h2>Ce que votre don<br><em>finance</em></h2>
       <div class="budget" data-stagger>
@@ -75,30 +76,30 @@
       </div>
     </section>
 
-    <section class="faqsec">
+    <section class="faqsec" id="faq">
       <p class="eyebrow">Questions fréquentes</p>
       <h2>Bon <em>à savoir</em></h2>
       <div class="faq" data-accordion>
-        <details><summary>Comment puis-je payer mon don&nbsp;?</summary><p>Par TWINT, en scannant un QR-facture avec l'application de votre banque, ou par virement classique. Tout se passe dans la fenêtre « Faire un don ».</p></details>
+        <details><summary>Comment puis-je payer mon don&nbsp;?</summary><p>Par TWINT ou par virement bancaire. Tout se passe dans la fenêtre « Faire un don » : vous y trouvez le lien TWINT et les coordonnées bancaires, avec des boutons pour les copier.</p></details>
+        <details><summary>Puis-je donner de façon anonyme&nbsp;?</summary><p>Oui. Par défaut, votre don apparaît de façon anonyme sur le site. Seule l'équipe connaît votre nom, pour vous remercier et vérifier la réception du paiement.</p></details>
         <details><summary>Qui gère l'argent récolté&nbsp;?</summary><p>Notre association « Des Alpes à l'Arctique », avec son propre compte bancaire. L'argent sert uniquement au voyage d'étude.</p></details>
         <details><summary>Puis-je donner au nom de mon entreprise&nbsp;?</summary><p>Oui, bien sûr. Choisissez « Entreprise » dans le formulaire de don, ou contactez-nous pour un partenariat : nous venons volontiers vous présenter le projet.</p></details>
-        <details><summary>Recevrai-je une confirmation&nbsp;?</summary><p>Oui, nous vous remercions par e-mail après votre don.</p></details>
-        <details><summary>Mon nom apparaîtra-t-il quelque part&nbsp;?</summary><p>Seulement si vous le souhaitez : une case à cocher dans le formulaire vous le permet.</p></details>
+        <details><summary>Recevrai-je une confirmation&nbsp;?</summary><p>Oui : un premier e-mail tout de suite, avec les informations de paiement, puis un second quand votre paiement nous est parvenu.</p></details>
+        <details><summary>Mon nom apparaîtra-t-il quelque part&nbsp;?</summary><p>Seulement si vous choisissez « Avec mon nom » : votre prénom apparaîtra alors dans la liste des soutiens sur cette page.</p></details>
       </div>
     </section>
   </main>
   <div id="site-footer"></div>
+  <script>SvalbardLayout.footer()</script>
   <div class="lightbox" aria-hidden="true"><img alt=""><p></p><button class="round" aria-label="Fermer">✕</button></div>
 
-  <script src="js/config.js?v=1790275169"></script>
-  <script src="js/layout.js?v=1790275169"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3-array@3/dist/d3-array.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3-contour@4/dist/d3-contour.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-  <script src="js/pay.js?v=1790275169"></script>
-  <script src="js/main.js?v=1790275169"></script>
+  <script src="js/pay.js?v=1790277311"></script>
+  <script src="js/main.js?v=1790277311"></script>
 </body>
 </html>

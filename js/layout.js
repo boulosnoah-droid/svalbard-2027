@@ -6,14 +6,21 @@
 (() => {
   const page = document.body.dataset.page || "";
   const email = (window.SITE_CONFIG || {}).email || "svalbardcsud@gmail.com";
+  // [fichier, identifiant, titre, sous-rubriques : [ancre ou fenêtre, titre, ouvre-une-fenêtre ?]]
   const links = [
-    ["voyage.html", "voyage", "Le voyage"],
-    ["svalbard.html", "svalbard", "Le Svalbard"],
-    ["equipe.html", "equipe", "L'équipe"],
-    ["soutenir.html", "soutenir", "Nous soutenir"],
+    ["voyage.html", "voyage", "Le voyage", [["#trajet", "Le trajet"], ["#objectifs", "Nos objectifs"], ["#themes", "Les cinq thèmes"], ["#retour", "Au retour"]]],
+    ["svalbard.html", "svalbard", "Le Svalbard", [["#chiffres", "En chiffres"], ["#faits", "Le saviez-vous ?"], ["#climat", "Un Arctique qui change"], ["#galerie", "Galerie"]]],
+    ["equipe.html", "equipe", "L'équipe", [["#eleves", "Les élèves"], ["#encadrement", "L'encadrement"], ["#association", "L'association"]]],
+    ["soutenir.html", "soutenir", "Nous soutenir", [["don", "Faire un don", true], ["partenaire", "Devenir partenaire", true], ["livre", "Réserver le livre", true], ["#budget", "Où va votre argent"], ["#faq", "Questions fréquentes"]]],
   ];
-  const nav = links.map(([href, id, label]) => `<a href="${href}"${id === page ? ' aria-current="page"' : ""}>${label}</a>`).join("");
-  const menu = links.map(([href, id, label], i) => `<a href="${href}"${id === page ? ' aria-current="page"' : ""}><small>0${i + 1}</small>${label}</a>`).join("");
+  const cur = (id) => (id === page ? ' aria-current="page"' : "");
+  const sub = (href, items) => items.map(([h, l, modal], i) => modal
+    ? `<button type="button" data-open="${h}"><small>0${i + 1}</small>${l}</button>`
+    : `<a href="${href}${h}"><small>0${i + 1}</small>${l}</a>`).join("");
+  const nav = links.map(([href, id, label, items]) =>
+    `<div class="nav__item"><a href="${href}"${cur(id)}>${label}</a><div class="nav__drop"><div class="nav__dropin">${sub(href, items)}</div></div></div>`).join("");
+  const menu = links.map(([href, id, label, items], i) =>
+    `<div class="menu__group"><a href="${href}"${cur(id)}><small>0${i + 1}</small>${label}</a><div class="menu__sub">${sub(href, items)}</div></div>`).join("");
 
   const header = `
   <header class="nav">
@@ -29,7 +36,7 @@
     </div>
   </header>
   <div class="menu" aria-hidden="true">
-    <nav class="menu__links"><a href="index.html"${page === "accueil" ? ' aria-current="page"' : ""}><small>00</small>Accueil</a>${menu}</nav>
+    <nav class="menu__links"><div class="menu__group"><a href="index.html"${cur("accueil")}><small>00</small>Accueil</a></div>${menu}</nav>
     <div class="menu__foot">
       <button class="btn btn--line" data-open="contact"><span>Nous écrire</span></button>
       <span class="mono">78°13′N · 15°38′E</span>
@@ -151,9 +158,13 @@
           ${field("email", "E-mail * (pour votre confirmation)", 'type="email" required autocomplete="email"', true)}
           ${area("message", "Un mot pour l'équipe ? (facultatif)")}
         </div>
-        <label class="check"><input type="checkbox" name="public" value="oui"><span>J'accepte que mon nom apparaisse parmi nos soutiens.</span></label>
+        <fieldset class="checks">
+          <legend>Sur notre site, votre don apparaît…</legend>
+          <label class="pill"><input type="radio" name="affichage" value="anonyme" checked><span>De façon anonyme</span></label>
+          <label class="pill"><input type="radio" name="affichage" value="nom"><span>Avec mon nom</span></label>
+        </fieldset>
         ${hp}
-        <p class="privacy">Vos données servent uniquement à vous remercier et à suivre les dons. Elles ne sont jamais partagées.</p>
+        <p class="privacy">Votre nom et votre e-mail ne sont vus que par l'équipe, pour vous remercier et suivre les dons. Ils ne sont jamais partagés.</p>
         <div class="step__actions">
           <button type="button" class="btn btn--ghost" data-prev><span>Retour</span></button>
           <button type="submit" class="btn btn--accent"><span>Passer au paiement</span></button>
@@ -166,14 +177,13 @@
         <p class="pay__lead">Merci <b data-thanks-name></b> ! Choisissez comment verser votre don de <b data-thanks-amount></b>&nbsp;:</p>
         <div class="tabs" role="tablist">
           <button type="button" role="tab" class="tab is-on" data-tab="twint">TWINT</button>
-          <button type="button" role="tab" class="tab" data-tab="qr">App bancaire</button>
           <button type="button" role="tab" class="tab" data-tab="virement">Virement</button>
           <button type="button" role="tab" class="tab" data-tab="carte" hidden>Carte</button>
         </div>
         <div class="panel is-on" data-panel="twint"></div>
-        <div class="panel" data-panel="qr"></div>
         <div class="panel" data-panel="virement"></div>
         <div class="panel" data-panel="carte"></div>
+        <p class="pay__mail" data-pay-mail></p>
         <div class="step__actions">
           <button type="button" class="btn btn--ghost" data-prev><span>Modifier</span></button>
           <button type="button" class="btn btn--accent" data-close><span>Terminé</span></button>
@@ -182,8 +192,8 @@
     </form>
   </dialog>`;
 
-  const top = document.getElementById("site-header");
-  const bottom = document.getElementById("site-footer");
-  if (top) top.outerHTML = header;
-  if (bottom) bottom.outerHTML = footer + modals;
+  // L'en-tête est inséré immédiatement (ce script est placé juste après <body>) : pas de flash.
+  document.currentScript.insertAdjacentHTML("afterend", header);
+  // Le pied de page et les fenêtres sont insérés à l'endroit du <div id="site-footer">.
+  window.SvalbardLayout = { footer() { const el = document.getElementById("site-footer"); if (el) el.outerHTML = footer + modals; } };
 })();

@@ -1,55 +1,54 @@
 /* ==========================================================================
-   Le trajet : globe qui suit le voyage Bulle → Zurich (train) → Oslo →
-   Tromsø → Longyearbyen (avion) → glacier Esmarkbreen (bateau).
-   Trajet indicatif. Piloté par le défilement (voir main.js).
+   Le trajet : globe 3D (dessiné sur <canvas>, fluide) qui suit le voyage
+   Bulle → Zurich (train) → Oslo → Tromsø → Longyearbyen (avion),
+   puis une loupe sur l'Isfjorden pour le bateau jusqu'au glacier Esmarkbreen.
+   Trajet indicatif. Piloté par le défilement (voir main.js : setProgress).
    ========================================================================== */
 window.SvalbardGlobe = (() => {
-  const $ = (s, r = document) => r.querySelector(s);
-  const svg = $(".globe");
-  if (!svg || typeof d3 === "undefined" || !d3.geoOrthographic || typeof topojson === "undefined") return null;
+  const canvas = document.querySelector(".globe");
+  if (!canvas || typeof d3 === "undefined" || !d3.geoOrthographic || typeof topojson === "undefined") return null;
+  const ctx = canvas.getContext("2d");
+  const S = 800; // repère interne 800 × 800
 
   const P = {
     bulle: [7.06, 46.62], zrh: [8.56, 47.46], osl: [11.1, 60.19], tos: [18.92, 69.68],
-    lyr: [15.47, 78.25], port: [15.6, 78.232], esm: [14.33, 78.305],
+    lyr: [15.47, 78.25], port: [15.62, 78.228], esm: [14.33, 78.305],
   };
   const SEGS = [
-    { mode: "train", pts: [P.bulle, [7.16, 46.8], [7.44, 46.95], [7.9, 47.15], [8.3, 47.35], [8.54, 47.38], P.zrh], t0: 0.04, t1: 0.15 },
-    { mode: "plane", pts: [P.zrh, P.osl], t0: 0.2, t1: 0.37 },
-    { mode: "plane", pts: [P.osl, P.tos], t0: 0.43, t1: 0.55 },
-    { mode: "plane", pts: [P.tos, P.lyr], t0: 0.6, t1: 0.71 },
-    { mode: "boat", pts: [P.port, [15.45, 78.255], [15.1, 78.275], [14.75, 78.285], [14.45, 78.295], P.esm], t0: 0.87, t1: 0.98 },
+    { mode: "train", pts: [P.bulle, [7.16, 46.8], [7.44, 46.95], [7.9, 47.15], [8.3, 47.35], [8.54, 47.38], P.zrh], t0: 0.03, t1: 0.13 },
+    { mode: "plane", pts: [P.zrh, P.osl], t0: 0.22, t1: 0.38 },
+    { mode: "plane", pts: [P.osl, P.tos], t0: 0.42, t1: 0.54 },
+    { mode: "plane", pts: [P.tos, P.lyr], t0: 0.57, t1: 0.7 },
+    { mode: "boat", pts: [P.port, [15.45, 78.255], [15.1, 78.275], [14.75, 78.285], [14.45, 78.295], P.esm], t0: 0.84, t1: 0.97 },
   ];
-  const STOPS = [
-    [P.bulle, "Bulle", 0], [P.zrh, "Zurich", 0.15], [P.osl, "Oslo", 0.37], [P.tos, "Tromsø", 0.55],
-    [P.lyr, "Longyearbyen", 0.71], [P.esm, "Glacier Esmarkbreen", 0.98],
-  ];
-  // caméra : [progression, longitude, latitude, zoom]
+  const STOPS = [[P.bulle, "Bulle", 0], [P.zrh, "Zurich", 0.13], [P.osl, "Oslo", 0.38], [P.tos, "Tromsø", 0.54], [P.lyr, "Longyearbyen", 0.7]];
+  // caméra : [progression, longitude, latitude, zoom] — 380 = globe entier
   const CAM = [
-    [0, 7.7, 46.95, 5600], [0.15, 8.1, 47.2, 4200], [0.22, 9.5, 52, 760], [0.37, 11, 58.5, 760],
-    [0.43, 13, 62, 760], [0.55, 16, 67.5, 760], [0.6, 16, 70.5, 760], [0.71, 16, 75, 820],
-    [0.79, 17.5, 78.5, 5000], [0.87, 14.97, 78.268, 62000], [1, 14.95, 78.272, 66000],
+    [0, 7.6, 46.9, 2100], [0.13, 8.1, 47.2, 1900], [0.22, 10, 54, 380], [0.38, 11, 57, 380], [0.42, 12, 60, 380],
+    [0.54, 14, 64, 380], [0.57, 15, 66, 380], [0.7, 16, 71, 400], [0.8, 17, 78.3, 1500], [1, 17, 78.3, 1500],
   ];
+  const ICON = {
+    train: new Path2D("M12 2c-4 0-8 .5-8 4v9.5C4 17.43 5.57 19 7.5 19L6 20.5v.5h2.23l2-2H14l2 2h2v-.5L16.5 19c1.93 0 3.5-1.57 3.5-3.5V6c0-3.5-3.58-4-8-4zM7.5 17c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm3.5-7H6V6h5v4zm2 0V6h5v4h-5zm3.5 7c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"),
+    plane: new Path2D("M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"),
+    boat: "M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68c.08-.26.06-.54-.06-.78s-.34-.42-.6-.5L20 10.62V6c0-1.1-.9-2-2-2h-3V1H9v3H6c-1.1 0-2 .9-2 2v4.62l-1.29.42c-.26.08-.48.26-.6.5s-.15.52-.06.78L3.95 19zM6 6h12v3.97L12 8 6 9.97V6z",
+  };
+  const C = { sphere: "#0f2229", grat: "rgba(236,243,242,.07)", land: "#2b5563", focus: "#3b7383", border: "rgba(236,243,242,.2)", coast: "rgba(158,234,255,.35)",
+    accent: "#9eeaff", warm: "#ffb27a", ice: "#ecf3f2", ink: "#062029", mist: "#7f9696" };
 
-  const proj = d3.geoOrthographic().translate([400, 400]).clipAngle(90).precision(0.3);
-  const path = d3.geoPath(proj);
-  const el = (c) => $(c, svg);
+  const proj = d3.geoOrthographic().translate([S / 2, S / 2]).clipAngle(90).precision(0.5);
+  const path = d3.geoPath(proj, ctx);
   const smooth = (x) => x * x * (3 - 2 * x);
-  const hav = (a, b) => d3.geoDistance(a, b) * 6371;
-
-  // longueur (km) de chaque segment, pour le compteur
+  const km = (a, b) => d3.geoDistance(a, b) * 6371;
   SEGS.forEach((s) => {
-    s.interp = [];
-    s.km = 0;
-    for (let i = 1; i < s.pts.length; i++) { const k = hav(s.pts[i - 1], s.pts[i]); s.km += k; s.interp.push([s.km, d3.geoInterpolate(s.pts[i - 1], s.pts[i])]); }
-    if (s.mode === "train") s.km *= 1.15; // les rails ne sont pas en ligne droite
+    s.interp = []; s.len = 0;
+    for (let i = 1; i < s.pts.length; i++) { s.len += km(s.pts[i - 1], s.pts[i]); s.interp.push([s.len, d3.geoInterpolate(s.pts[i - 1], s.pts[i])]); }
+    s.km = s.mode === "train" ? s.len * 1.15 : s.len;
   });
-  const along = (s, t) => { // point du segment à la fraction t (0..1)
-    const target = t * s.interp[s.interp.length - 1][0];
-    let prev = 0;
+  const along = (s, t) => {
+    const target = t * s.len; let prev = 0;
     for (const [cum, f] of s.interp) { if (target <= cum) return f((target - prev) / (cum - prev || 1)); prev = cum; }
     return s.pts[s.pts.length - 1];
   };
-
   function camera(p) {
     let i = 0;
     while (i < CAM.length - 2 && p > CAM[i + 1][0]) i++;
@@ -58,100 +57,171 @@ window.SvalbardGlobe = (() => {
     return [lo0 + (lo1 - lo0) * t, la0 + (la1 - la0) * t, Math.exp(Math.log(s0) + (Math.log(s1) - Math.log(s0)) * t)];
   }
 
-  // données géographiques
-  let countries = null, borders = null, focus = null, svalbard = null;
-  const inSvalbard = (poly) => poly[0].every(([x, y]) => x >= 8 && x <= 36 && y >= 74 && y <= 81.5);
-  Promise.all([
-    fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json").then((r) => r.json()),
-    fetch("assets/geo/svalbard-10m.json").then((r) => r.json()),
-  ]).then(([topo, sv]) => {
-    const all = topojson.feature(topo, topo.objects.countries);
-    all.features.forEach((f) => { // le Svalbard détaillé remplace la version simplifiée
-      if (f.geometry && f.geometry.type === "MultiPolygon") f.geometry.coordinates = f.geometry.coordinates.filter((p) => !inSvalbard(p));
-    });
-    countries = all;
-    focus = { type: "FeatureCollection", features: all.features.filter((f) => f.id === "756" || f.id === "578") };
-    borders = topojson.mesh(topo, topo.objects.countries, (a, b) => a !== b);
-    svalbard = sv;
-    render(last, true);
-  }).catch(() => {});
-
-  const ICONS = {
-    train: '<path d="M-5 -7h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-10a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3zM-5 -4v4h10v-4zM-4 3.2a1.2 1.2 0 1 0 .01 0zM4 3.2a1.2 1.2 0 1 0 .01 0zM-6 8l2-2M6 8l-2-2" fill="#062029" stroke="#062029" stroke-width=".6"/>',
-    plane: '<path d="M0 -9l1.6 6 7.4 3.6v2l-7.4-2-.6 5.6 2.6 2v1.6L0 18l-3.6-.2v-1.6l2.6-2-.6-5.6-7.4 2v-2l7.4-3.6z" fill="#062029" transform="scale(.9) translate(0 -4)"/>',
-    boat: '<path d="M-9 2h18l-3.2 5.5h-11.6zM-1 -9v10h8zM-2.2 -7.5v8.5h-6z" fill="#062029"/>',
+  /* ---------- données ---------- */
+  const geo = { low: null, high: null, sv: null };
+  const prep = (topo) => {
+    const countries = topojson.feature(topo, topo.objects.countries);
+    return {
+      land: countries,
+      focus: { type: "FeatureCollection", features: countries.features.filter((f) => f.id === "756" || f.id === "578") },
+      borders: topojson.mesh(topo, topo.objects.countries, (a, b) => a !== b),
+    };
   };
+  fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then((r) => r.json()).then((t) => { geo.low = prep(t); draw(true); }).catch(() => {});
+  fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json").then((r) => r.json()).then((t) => { geo.high = prep(t); draw(true); }).catch(() => {});
+  fetch("assets/geo/svalbard-10m.json").then((r) => r.json()).then((d) => { geo.sv = d; loupeInit(); draw(true); }).catch(() => {});
 
-  let last = 0, lastKey = "", lastResult = { km: 0, lat: 46.62, active: 0 };
-  function render(p, force) {
-    last = p;
-    const [lon, lat, scale] = camera(p);
-    const key = [lon.toFixed(3), lat.toFixed(3), scale.toFixed(0), p.toFixed(4)].join();
-    if (!force && key === lastKey) return lastResult;
-    lastKey = key;
+  /* ---------- taille du canvas ---------- */
+  let k = 1;
+  function resize() {
+    const r = canvas.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+    canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.width * dpr);
+    k = canvas.width / S;
+    draw(true);
+  }
+  addEventListener("resize", resize);
+
+  /* ---------- dessin ---------- */
+  let target = 0, shown = 0, lastDrawn = -1, result = { km: 0, lat: 46.62, active: 0 };
+  const arcPoints = (s, t, n = 40) => { // points à l'écran d'un vol, soulevés pour faire un arc
+    const a = proj(s.pts[0]), b = proj(s.pts[1]);
+    const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy) || 1;
+    let nx = dy / len, ny = -dx / len; if (nx < 0) { nx = -nx; ny = -ny; } // l'arc part vers la droite (vers l'est)
+    const lift = Math.min(90, len * 0.18), out = [];
+    const steps = Math.max(1, Math.ceil(n * t));
+    for (let i = 0; i <= steps; i++) {
+      const f = (i / steps) * t, [x, y] = proj(along(s, f)), h = Math.sin(Math.PI * f) * lift;
+      out.push([x + nx * h, y + ny * h]);
+    }
+    return out;
+  };
+  function badge(x, y, icon, angle) {
+    ctx.save(); ctx.translate(x, y);
+    ctx.shadowColor = "rgba(158,234,255,.8)"; ctx.shadowBlur = 16;
+    ctx.fillStyle = C.accent; ctx.beginPath(); ctx.arc(0, 0, 17, 0, 7); ctx.fill();
+    ctx.shadowBlur = 0; ctx.lineWidth = 2; ctx.strokeStyle = C.ice; ctx.stroke();
+    ctx.rotate(angle || 0); ctx.scale(0.95, 0.95); ctx.translate(-12, -12);
+    ctx.fillStyle = C.ink; ctx.fill(icon);
+    ctx.restore();
+  }
+  function draw(force) {
+    if (!force && Math.abs(shown - lastDrawn) < 0.0002) return;
+    lastDrawn = shown;
+    const p = shown, [lon, lat, scale] = camera(p);
     proj.rotate([-lon, -lat]).scale(scale);
-    el(".globe__sphere").setAttribute("r", scale);
-    const step = scale > 12000 ? [0.5, 0.25] : scale > 3000 ? [2, 1] : [10, 10];
-    el(".globe__grat").setAttribute("d", path(d3.geoGraticule().step(step)()) || "");
-    if (countries) {
-      el(".globe__land").setAttribute("d", path(countries) || "");
-      el(".globe__focus").setAttribute("d", path(focus) || "");
-      el(".globe__borders").setAttribute("d", path(borders) || "");
-      el(".globe__sv").setAttribute("d", scale > 600 ? path(svalbard) || "" : "");
+    ctx.setTransform(k, 0, 0, k, 0, 0);
+    ctx.clearRect(0, 0, S, S);
+
+    // globe + halo
+    const g = ctx.createRadialGradient(S / 2 - scale * 0.3, S / 2 - scale * 0.35, scale * 0.1, S / 2, S / 2, scale);
+    g.addColorStop(0, "#18343d"); g.addColorStop(1, C.sphere);
+    ctx.save();
+    if (scale < 520) { ctx.shadowColor = "rgba(158,234,255,.35)"; ctx.shadowBlur = 50; }
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(S / 2, S / 2, scale, 0, 7); ctx.fill();
+    ctx.restore();
+    ctx.lineWidth = 1; ctx.strokeStyle = C.grat; ctx.beginPath(); path(d3.geoGraticule10()); ctx.stroke();
+
+    const data = (scale > 700 && geo.high) || geo.low || geo.high;
+    if (data) {
+      ctx.fillStyle = C.land; ctx.beginPath(); path(data.land); ctx.fill();
+      ctx.fillStyle = C.focus; ctx.beginPath(); path(data.focus); ctx.fill();
+      ctx.strokeStyle = C.border; ctx.lineWidth = 0.7; ctx.beginPath(); path(data.borders); ctx.stroke();
+      if (scale > 900 && geo.sv && lat > 70) { ctx.fillStyle = C.land; ctx.strokeStyle = C.coast; ctx.lineWidth = 0.8; ctx.beginPath(); path(geo.sv); ctx.fill(); ctx.stroke(); }
     }
     // cercle polaire
-    el(".globe__polar").setAttribute("d", path({ type: "LineString", coordinates: d3.range(-180, 181, 2).map((x) => [x, 66.56]) }) || "");
+    ctx.save(); ctx.setLineDash([4, 6]); ctx.strokeStyle = "rgba(255,178,122,.6)"; ctx.lineWidth = 1.2;
+    ctx.beginPath(); path({ type: "LineString", coordinates: d3.range(-180, 181, 3).map((x) => [x, 66.56]) }); ctx.stroke(); ctx.restore();
 
-    const center = [lon, lat];
-    const visible = (ll) => d3.geoDistance(ll, center) < Math.PI / 2 - 0.02;
-    let routes = "", vehicle = "", km = 0, pos = P.bulle, active = 0;
+    // itinéraire
+    let kmDone = 0, pos = P.bulle, active = 0, vehicle = null;
     SEGS.forEach((s, i) => {
       const t = Math.max(0, Math.min(1, (p - s.t0) / (s.t1 - s.t0)));
       if (p >= s.t0) active = i;
-      km += s.km * t;
-      if (t <= 0) return;
-      const n = 48, pts = [];
-      for (let k = 0; k <= n * t; k++) pts.push(along(s, k / n));
-      pts.push(along(s, t));
-      if (s.mode === "plane") {
-        // arc « en vol » : on soulève la ligne perpendiculairement à la corde
-        const a = proj(s.pts[0]), b = proj(s.pts[1]);
-        const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy) || 1;
-        let nx = dy / len, ny = -dx / len;
-        if (ny > 0) { nx = -nx; ny = -ny; }
-        const lift = len * 0.16;
-        const scr = pts.map((ll, k) => {
-          const f = k / n, [x, y] = proj(ll), h = Math.sin(Math.PI * Math.min(1, f)) * lift;
-          return [x + nx * h, y + ny * h];
-        });
-        routes += `<path class="r r--plane" d="M${scr.map((q) => q.map((v) => v.toFixed(1)).join(" ")).join("L")}"/>`;
-        if (t < 1) {
-          const q = scr[scr.length - 1], q0 = scr[Math.max(0, scr.length - 3)];
-          const ang = Math.atan2(q[1] - q0[1], q[0] - q0[0]) * 180 / Math.PI + 90;
-          vehicle = `<g transform="translate(${q[0]} ${q[1]})"><circle r="17"/><g transform="rotate(${ang})">${ICONS.plane}</g></g>`;
-        }
+      kmDone += s.km * t;
+      if (t <= 0 || s.mode === "boat") { if (t > 0) pos = along(s, t); return; }
+      ctx.save(); ctx.lineCap = "round";
+      if (s.mode === "train") {
+        ctx.setLineDash([2, 7]); ctx.strokeStyle = C.warm; ctx.lineWidth = 3.5;
+        const pts = d3.range(0, t + 1e-9, t / 30 || 1).map((f) => along(s, f));
+        ctx.beginPath(); path({ type: "LineString", coordinates: pts }); ctx.stroke();
+        if (t < 1) { const q = proj(along(s, t)); vehicle = [q[0], q[1], ICON.train, 0]; }
       } else {
-        const d = path({ type: "LineString", coordinates: pts });
-        routes += `<path class="r r--${s.mode}" d="${d || ""}"/>`;
-        if (t < 1 && t > 0) {
-          const q = proj(pts[pts.length - 1]);
-          vehicle = `<g transform="translate(${q[0]} ${q[1]})"><circle r="17"/>${ICONS[s.mode]}</g>`;
+        const pts = arcPoints(s, t);
+        ctx.setLineDash([9, 8]); ctx.strokeStyle = C.accent; ctx.lineWidth = 2.6; ctx.shadowColor = "rgba(158,234,255,.6)"; ctx.shadowBlur = 8;
+        ctx.beginPath(); pts.forEach(([x, y], j) => (j ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke();
+        if (t < 1) {
+          const q = pts[pts.length - 1], q0 = pts[Math.max(0, pts.length - 3)];
+          vehicle = [q[0], q[1], ICON.plane, Math.atan2(q[1] - q0[1], q[0] - q0[0]) + Math.PI / 2];
         }
       }
+      ctx.restore();
       pos = along(s, t);
     });
-    el(".globe__routes").innerHTML = routes;
-    el(".globe__vehicle").innerHTML = vehicle;
-    el(".globe__pts").innerHTML = STOPS.map(([ll, name, at]) => {
-      if (!visible(ll)) return "";
-      const [x, y] = proj(ll), on = p >= at;
-      if (!on && p < at - 0.16) return ""; // on n'affiche que l'étape suivante
-      const right = name !== "Glacier Esmarkbreen";
-      return `<g class="${on ? "is-on" : ""}"><circle class="halo" cx="${x}" cy="${y}" r="${on ? 13 : 0}"/><circle cx="${x}" cy="${y}" r="${on ? 5 : 3.5}"/><text x="${right ? x + 16 : x - 16}" y="${y + 5}" text-anchor="${right ? "start" : "end"}">${name}</text></g>`;
-    }).join("");
-    lastResult = { km, lat: pos[1], active };
-    return lastResult;
+
+    // escales
+    const center = [lon, lat];
+    ctx.font = "500 15px 'JetBrains Mono', monospace"; ctx.textBaseline = "middle";
+    STOPS.forEach(([ll, name, at]) => {
+      if (d3.geoDistance(ll, center) > Math.PI / 2 - 0.05) return;
+      const on = p >= at; if (!on && p < at - 0.14) return;
+      const [x, y] = proj(ll);
+      ctx.globalAlpha = on ? 1 : 0.5;
+      if (on) { ctx.fillStyle = "rgba(158,234,255,.22)"; ctx.beginPath(); ctx.arc(x, y, 12, 0, 7); ctx.fill(); }
+      ctx.fillStyle = on ? C.accent : C.mist; ctx.beginPath(); ctx.arc(x, y, on ? 5 : 3.5, 0, 7); ctx.fill();
+      ctx.lineWidth = 4; ctx.strokeStyle = "rgba(8,16,20,.85)"; ctx.fillStyle = C.ice;
+      const label = name.toUpperCase(), right = name !== "Zurich";
+      ctx.textAlign = right ? "left" : "right";
+      ctx.strokeText(label, x + (right ? 16 : -16), y); ctx.fillText(label, x + (right ? 16 : -16), y);
+      ctx.globalAlpha = 1;
+    });
+    if (vehicle) badge(...vehicle);
+
+    result = { km: kmDone, lat: pos[1], active, p };
+    loupeDraw(p);
   }
 
-  return { render };
+  /* ---------- loupe sur l'Isfjorden (bateau) ---------- */
+  const loupe = document.querySelector(".loupe");
+  let loupeProj, loupePath, boatEl, trailEl;
+  function loupeInit() {
+    if (!loupe || !geo.sv) return;
+    const svg = loupe.querySelector("svg");
+    loupeProj = d3.geoMercator().fitExtent([[20, 30], [280, 270]], { type: "MultiPoint", coordinates: [[13.75, 78.15], [16.1, 78.42]] });
+    loupePath = d3.geoPath(loupeProj);
+    const route = SEGS[4].pts;
+    svg.querySelector(".loupe__land").setAttribute("d", loupePath(geo.sv));
+    svg.querySelector(".loupe__route").setAttribute("d", loupePath({ type: "LineString", coordinates: route }));
+    trailEl = svg.querySelector(".loupe__trail");
+    boatEl = svg.querySelector(".loupe__boat");
+    boatEl.querySelector("path").setAttribute("d", ICON.boat);
+    const put = (sel, ll) => { const [x, y] = loupeProj(ll); svg.querySelector(sel).setAttribute("transform", `translate(${x} ${y})`); };
+    put(".loupe__lyr", P.port); put(".loupe__esm", P.esm);
+  }
+  function loupeDraw(p) {
+    if (!loupe) return;
+    const vis = Math.max(0, Math.min(1, (p - 0.79) / 0.05));
+    loupe.style.opacity = vis;
+    loupe.style.transform = `scale(${0.85 + 0.15 * vis})`;
+    if (!loupeProj) return;
+    const s = SEGS[4], t = Math.max(0, Math.min(1, (p - s.t0) / (s.t1 - s.t0)));
+    const pts = d3.range(0, t + 1e-9, 0.02).map((f) => along(s, f)).concat([along(s, t)]);
+    trailEl.setAttribute("d", loupePath({ type: "LineString", coordinates: pts }) || "");
+    const [x, y] = loupeProj(along(s, t));
+    boatEl.setAttribute("transform", `translate(${x} ${y})`);
+    loupe.classList.toggle("is-done", t >= 1);
+  }
+
+  /* ---------- boucle : on suit le défilement en douceur ---------- */
+  (function loop() {
+    shown += (target - shown) * 0.18;
+    if (Math.abs(target - shown) < 0.0005) shown = target;
+    draw(false);
+    requestAnimationFrame(loop);
+  })();
+  resize();
+
+  return {
+    setProgress(p) { target = p; return result; },
+    get state() { return result; },
+  };
 })();

@@ -15,52 +15,54 @@ equipe.html         L'équipe : élèves, encadrement, association
 soutenir.html       Nous soutenir : objectif, dons, partenariats, livre, questions
 credits.html        Crédits photos (obligatoires pour les photos sous licence libre)
 css/style.css       le style
-js/config.js        ⚙️ LES RÉGLAGES : e-mail, IBAN, adresse, TWINT, montant collecté, formulaires
+js/config.js        ⚙️ LES RÉGLAGES : e-mail, IBAN, TWINT, formulaires
 js/layout.js        en-tête, menu, pied de page et fenêtres (contact, partenaire, livre, don), communs à toutes les pages
-js/pay.js           fenêtre de don : TWINT, QR-facture suisse, virement
-js/globe.js         le globe du trajet (train → avions → bateau)
+js/pay.js           fenêtre de don : TWINT, virement (carte en option)
+js/globe.js         le globe du trajet (canvas : train → avions, puis loupe sur le bateau)
 js/main.js          animations et formulaires
 assets/img/         photos (© Daniel Rohrbasser + Wikimedia Commons, voir credits.html)
 assets/geo/         contour détaillé du Svalbard (Natural Earth) pour le zoom du globe
-apps-script/Code.gs le petit « serveur » gratuit qui garde l'historique (Google Sheets)
+apps-script/Code.gs le petit « serveur » gratuit (Google Sheets) : historique, e-mails, jauge
+apps-script/test.js test hors ligne de Code.gs
 ```
 
 ## Ce qu'il reste à faire avant de publier
 
-Tout se règle dans **`js/config.js`** :
+1. **Brancher Google Sheets** (10 minutes, une seule fois, voir plus bas) → `formEndpoint` dans `js/config.js`.
+2. Quand le compte bancaire existe : `iban` et `bank` dans `js/config.js` **et** `IBAN` dans `apps-script/Code.gs` (pour l'e-mail de confirmation).
+3. Quand l'association est inscrite chez TWINT : `twintLink` dans `js/config.js` **et** `LIEN_TWINT` dans `apps-script/Code.gs`.
+4. Faire relire par Daniel les textes, les légendes et les faits de la page « Le Svalbard ».
+5. Vérifier que toute l'équipe est d'accord pour que les noms soient publics. Il n'y a volontairement **aucune photo de groupe** sur le site.
 
-- [ ] `iban` et `bank` : dès que le compte de l'association est ouvert.
-- [ ] `creditor` : l'adresse postale de l'association (rue, numéro, NPA, localité). Elle est obligatoire pour générer le **QR-facture suisse**.
-- [ ] `twintLink` : le **lien de paiement TWINT** de l'association (twint.ch → Clubs & associations, environ 1,3 % de frais, inscription gratuite).
-- [ ] `cardLink` (facultatif) : un lien de paiement par carte ou Apple Pay (Payrexx, Stripe…). Un onglet « Carte » apparaît alors tout seul dans la fenêtre de don.
-- [ ] `formEndpoint` : l'adresse Google Apps Script (voir plus bas). Sans elle, les formulaires affichent l'adresse e-mail à copier.
-- [ ] `raised` : le montant déjà réuni, à mettre à jour de temps en temps (laisser `null` pour ne rien afficher).
-- [ ] Faire relire par Daniel les textes, les légendes et les faits de la page « Le Svalbard ».
-- [ ] Vérifier que toute l'équipe est d'accord pour que les noms soient publics. Il n'y a volontairement **aucune photo de groupe** sur le site.
+Facultatif : `cardLink` (paiement par carte ou Apple Pay via Payrexx ou Stripe). Un onglet « Carte » apparaît alors tout seul.
 
-## Comment marchent les dons
+## Comment marchent les dons (de A à Z)
 
-1. Le donateur ouvre « Faire un don » (bouton présent sur toutes les pages), choisit un montant, puis laisse son nom et son e-mail.
-2. Le don est enregistré comme **promesse** dans Google Sheets (onglet « Dons »), et l'équipe reçoit un e-mail.
-3. Le donateur choisit comment payer, sans quitter la fenêtre :
-   - **TWINT** : bouton vers le lien de paiement TWINT, ou QR à scanner sur ordinateur ;
-   - **App bancaire** : QR-facture suisse généré avec le montant exact, lisible par toutes les banques suisses ;
-   - **Virement** : IBAN, bénéficiaire, montant et communication, chacun avec un bouton Copier.
-4. Quand l'argent arrive sur le compte ou sur TWINT, on coche **Payé ?** dans la feuille, en s'aidant de la communication (`Don Svalbard 2027 – Prénom Nom`).
+1. Le donateur clique sur « Faire un don » (en haut de chaque page), choisit un montant, donne son nom et son e-mail, et choisit si son don apparaît **anonymement** (par défaut) ou **avec son prénom**.
+2. **Automatique** : une ligne s'ajoute dans l'onglet « Dons » de la feuille Google Sheets, l'équipe reçoit un e-mail « Nouveau don annoncé », et le donateur reçoit un e-mail de confirmation avec le lien TWINT et l'IBAN.
+3. Le donateur paie, sans quitter la fenêtre : **TWINT** (bouton, ou QR code sur ordinateur) ou **virement** (IBAN, montant et communication, chacun avec un bouton Copier).
+4. **À faire par l'équipe** : quand l'argent arrive (dans l'app TWINT ou sur le relevé bancaire, grâce à la communication `Don Svalbard 2027 – Prénom Nom`), mettre **Payé ?** sur « oui » dans la feuille.
+5. **Automatique** : le donateur reçoit un e-mail « Paiement bien reçu, merci ». L'onglet « Tableau de bord » recalcule le total, et la **jauge du site se met à jour toute seule**. Les prénoms des donateurs « avec mon nom » apparaissent sur la page Nous soutenir ; les anonymes, jamais.
+6. Les recettes hors site (ventes de gâteaux, dons en main propre…) s'ajoutent dans la case jaune du « Tableau de bord ». Elles comptent aussi dans la jauge.
 
-## Brancher les formulaires (historique des dons et des messages)
+Le site ne peut pas savoir tout seul qu'un virement est arrivé : aucune banque ne le permet gratuitement. C'est pour ça qu'il y a la case « Payé ? ». C'est la seule action manuelle.
 
-**À faire avant la mise en ligne.** Sans cette étape, les formulaires ne peuvent pas envoyer : ils affichent l'adresse `svalbardcsud@gmail.com` à copier.
-Avec cette étape, chaque don, message, demande de partenariat ou réservation du livre est **enregistré automatiquement dans un tableur Google Sheets**, et l'équipe reçoit un e-mail.
+## Brancher les formulaires (Google Sheets)
 
-1. Se connecter au compte Google **svalbardcsud@gmail.com**.
-2. Créer une nouvelle feuille Google Sheets, par exemple « Svalbard : dons et messages ».
-3. Menu **Extensions → Apps Script**, effacer le contenu, puis coller tout le fichier `apps-script/Code.gs`. Enregistrer.
-4. Choisir la fonction `testerUnDon` en haut, puis cliquer sur **Exécuter**. Google demande les autorisations (accès à la feuille et envoi d'e-mails) : accepter. Un onglet « Dons » apparaît avec une ligne de test.
-5. **Déployer → Nouveau déploiement → Type : Application Web**, avec *Exécuter en tant que : moi* et *Qui a accès : Tout le monde*. Cliquer sur **Déployer**.
-6. Copier l'**URL de l'application Web** (elle finit par `/exec`) et la coller dans `formEndpoint` de `js/config.js`.
+**Pourquoi ?** Un site GitHub Pages ne peut pas envoyer d'e-mail ni garder de données. Google Apps Script sert de petit « serveur » gratuit : il reçoit les formulaires, les range dans une feuille Google Sheets et envoie les e-mails. **Tant que ce n'est pas branché, les formulaires affichent « l'envoi en ligne n'est pas encore activé ».**
 
-Pour voir qui a donné : il suffit d'ouvrir la feuille. Onglet **Dons** : date, montant, nom, e-mail, référence. Onglet **Messages** : contacts, partenariats et livres. Il faut cocher la colonne **Payé ?** quand le virement ou le TWINT arrive sur le compte, en comparant avec la **référence** (ex. `Don Svalbard 2027 – Léa Exemple`). La feuille peut être partagée avec Daniel ou avec les autres élèves (bouton Partager, en lecture seule).
+1. Se connecter au compte Google **svalbardcsud@gmail.com**, puis créer une feuille Google Sheets, par exemple « Svalbard : dons et messages ».
+2. Menu **Extensions → Apps Script**. Effacer le contenu, coller tout le fichier `apps-script/Code.gs`, puis enregistrer (icône disquette).
+3. En haut, choisir la fonction **`installer`**, puis **Exécuter**. Google demande des autorisations (feuille et envoi d'e-mails) : **Autoriser**. Si « Google n'a pas validé cette application » s'affiche : *Paramètres avancés → Accéder au projet*. C'est normal, c'est votre propre script. Les onglets Dons, Messages et Tableau de bord se créent.
+4. (Facultatif) Choisir **`testerUnDon`**, puis **Exécuter** : une ligne de test apparaît et deux e-mails arrivent dans la boîte svalbardcsud. Supprimer ensuite la ligne.
+5. **Déployer → Nouveau déploiement → ⚙️ Application Web**, avec *Exécuter en tant que : moi* et *Qui a accès : Tout le monde*. Cliquer sur **Déployer**.
+6. Copier l'**URL de l'application Web** (elle finit par `/exec`) et la coller dans `formEndpoint` de `js/config.js`. C'est terminé.
+
+**Qui peut voir les dons ?** Seules les personnes qui ont accès à la feuille (le compte svalbardcsud, plus ceux avec qui vous la partagez via le bouton *Partager*). Onglet « Dons » : qui, combien, quand, payé ou pas. Onglet « Messages » : contacts, partenariats, réservations du livre. Les e-mails arrivent aussi dans la boîte svalbardcsud@gmail.com.
+
+**Modifier le script plus tard** (par exemple pour ajouter l'IBAN) : le modifier dans Apps Script, puis *Déployer → Gérer les déploiements → ✏️ → Version : Nouvelle version → Déployer*. L'URL ne change pas.
+
+**Tester le script sans Google** : `node apps-script/test.js apps-script/Code.gs`.
 
 ## Voir le site en local
 

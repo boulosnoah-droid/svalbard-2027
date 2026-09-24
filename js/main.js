@@ -11,16 +11,28 @@
   const fmt = (n) => Math.round(n).toLocaleString("fr-CH").replace(/ |\s/g, "'");
   let lenis = null;
 
-  /* ---------- jauge de la collecte ---------- */
+  /* ---------- jauge de la collecte (lue automatiquement dans Google Sheets) ---------- */
   function goal() {
     const bar = $(".goal__bar");
-    if (!bar) return;
+    const wall = $("[data-donors]");
+    if (!bar && !wall) return;
     const total = CFG.goal || 40000;
     $$("[data-goal-total]").forEach((e) => (e.textContent = fmt(total)));
-    if (typeof CFG.raised === "number") {
-      $("[data-goal-raised]").innerHTML = "CHF <b>" + fmt(CFG.raised) + "</b> déjà réunis";
-      bar.dataset.target = Math.min(100, (CFG.raised / total) * 100);
-    } else bar.classList.add("is-pending");
+    const show = (raised, donors, names) => {
+      if (bar && typeof raised === "number" && raised > 0) {
+        $("[data-goal-raised]").innerHTML = "CHF <b>" + fmt(raised) + "</b> déjà réunis" + (donors ? ` · ${donors} don${donors > 1 ? "s" : ""}` : "");
+        bar.classList.remove("is-pending");
+        const pct = Math.min(100, (raised / total) * 100);
+        hasGsap ? gsap.to($("span", bar), { width: pct + "%", duration: 2, ease: "power3.out", scrollTrigger: { trigger: bar, start: "top 90%" } }) : ($("span", bar).style.width = pct + "%");
+      }
+      if (wall && names && names.length) {
+        wall.hidden = false;
+        $("[data-donors-list]", wall).innerHTML = names.map((n) => `<li>${n.replace(/[<>&]/g, "")}</li>`).join("");
+      }
+    };
+    if (bar) bar.classList.add("is-pending");
+    if (typeof CFG.raised === "number") show(CFG.raised);
+    else if (CFG.formEndpoint) fetch(CFG.formEndpoint).then((r) => r.json()).then((d) => show(d.raised, d.donors, d.names)).catch(() => {});
   }
 
   /* ---------- fenêtres (dialog) ---------- */
@@ -120,12 +132,15 @@
         lenis ? lenis.scrollTo(t, { duration: 1.4 }) : t.scrollIntoView({ behavior: "smooth" });
         return;
       }
-      if (!/\.html(#.*)?$/.test(href) || reduce || !hasGsap) return;
-      // rideau de transition entre les pages
-      e.preventDefault(); setMenu(false);
-      gsap.fromTo(".curtain", { yPercent: 100 }, { yPercent: 0, duration: .7, ease: "expo.inOut", onComplete: () => (location.href = href) });
+      // lien vers une section de la page actuelle (ex. menu déroulant) : défilement doux
+      const [file, hash] = href.split("#");
+      const here = location.pathname.split("/").pop() || "index.html";
+      if (hash && file === here) {
+        const t = document.getElementById(hash); if (!t) return;
+        e.preventDefault(); setMenu(false);
+        lenis ? lenis.scrollTo(t, { duration: 1.4 }) : t.scrollIntoView({ behavior: "smooth" });
+      }
     });
-    addEventListener("pageshow", (e) => { if (e.persisted && hasGsap) gsap.set(".curtain", { yPercent: -100 }); });
   }
 
   /* ---------- fond topographique animé ---------- */
@@ -252,21 +267,22 @@
   /* ---------- animations au défilement ---------- */
   function scrollFx() {
     const journey = $(".journey");
-    const ends = [0.15, 0.37, 0.55, 0.71, 0.98];
-    const updateJourney = (p) => {
-      if (!window.SvalbardGlobe) return;
-      const r = window.SvalbardGlobe.render(p);
-      $("[data-lat]").textContent = r.lat.toFixed(1);
-      $("[data-km]").textContent = fmt(r.km);
-      $$(".journey__steps li").forEach((li, i) => {
-        li.classList.toggle("is-on", i === r.active && p > 0.02 && p < ends[i]);
-        li.classList.toggle("is-done", p >= ends[i]);
-      });
-    };
+    const G = window.SvalbardGlobe;
+    const ends = [0.13, 0.38, 0.54, 0.7, 0.97];
+    const steps = $$(".journey__steps li"), latEl = $("[data-lat]"), kmEl = $("[data-km]");
+    const updateJourney = (p) => { if (G) G.setProgress(p); };
+    if (journey && G) (function panel() {
+      const r = G.state;
+      if (r.p !== undefined) {
+        latEl.textContent = r.lat.toFixed(1);
+        kmEl.textContent = fmt(r.km);
+        steps.forEach((li, i) => { li.classList.toggle("is-on", i === r.active && r.p > 0.02 && r.p < ends[i]); li.classList.toggle("is-done", r.p >= ends[i]); });
+      }
+      requestAnimationFrame(panel);
+    })();
     if (!hasGsap || reduce) {
       $$("[data-split] .w, [data-split]").forEach((w) => (w.style.opacity = 1));
       $$("[data-count]").forEach((el) => (el.textContent = (el.dataset.prefix || "") + (el.hasAttribute("data-sep") ? fmt(+el.dataset.count) : el.dataset.count)));
-      const bar = $(".goal__bar"); if (bar && bar.dataset.target) $("span", bar).style.width = bar.dataset.target + "%";
       if (journey) updateJourney(1);
       return;
     }
@@ -354,8 +370,6 @@
       $$(".float").forEach((f) => gsap.to(f, { yPercent: parseFloat(f.dataset.speed || 0) * -120, ease: "none", scrollTrigger: { trigger: ".gallery__field", start: "top bottom", end: "bottom top", scrub: true } }));
     });
 
-    const goalBar = $(".goal__bar");
-    if (goalBar && goalBar.dataset.target) gsap.to(".goal__bar span", { width: goalBar.dataset.target + "%", duration: 2, ease: "power3.out", scrollTrigger: { trigger: goalBar, start: "top 85%" } });
 
     const big = $(".footer__big");
     if (big) gsap.from(big, { yPercent: 25, opacity: 0, duration: 1.4, ease: "expo.out", scrollTrigger: { trigger: ".footer", start: "top 80%" } });
@@ -363,31 +377,20 @@
 
   /* ---------- arrivée sur la page ---------- */
   function intro() {
-    const loader = $(".loader");
     const heroIn = () => {
+      document.body.classList.remove("is-loading");
+      if (hasGsap) ScrollTrigger.refresh();
+      if (location.hash) { const t = document.getElementById(location.hash.slice(1)); if (t) lenis ? lenis.scrollTo(t, { immediate: true }) : t.scrollIntoView(); }
       if (!hasGsap || reduce) return;
-      gsap.from(".hero__title .word, .phero__title .word", { yPercent: 110, duration: 1.3, ease: "expo.out", stagger: .1 });
-      gsap.from(".hero__media img, .phero__media img", { scale: 1.2, duration: 2, ease: "expo.out" });
-      gsap.from(".hero__inner > :not(h1), .phero__inner > :not(h1)", { opacity: 0, y: 16, duration: 1, stagger: .06, ease: "power3.out", delay: .35 });
+      gsap.from(".hero__title .word, .phero__title .word", { yPercent: 105, duration: 1.1, ease: "expo.out", stagger: .08 });
+      gsap.from(".hero__media img, .phero__media img", { scale: 1.12, duration: 1.6, ease: "expo.out" });
+      gsap.from(".hero__inner > :not(h1), .phero__inner > :not(h1)", { opacity: 0, y: 14, duration: .8, stagger: .05, ease: "power3.out", delay: .2 });
     };
-    const done = () => { document.body.classList.remove("is-loading"); if (hasGsap) ScrollTrigger.refresh(); };
-    let seen = false;
-    try { seen = sessionStorage.getItem("sv-intro") === "1"; sessionStorage.setItem("sv-intro", "1"); } catch (e) {}
-    if (!loader || seen || !hasGsap || reduce) {
-      if (loader) loader.remove();
-      if (hasGsap && !reduce) gsap.fromTo(".curtain", { yPercent: 0 }, { yPercent: -100, duration: .9, ease: "expo.inOut", delay: .05 });
-      done(); heroIn(); return;
-    }
-    if (hasGsap) gsap.set(".curtain", { yPercent: -100 });
-    const latEl = $("[data-loader-lat]"), o = { v: 46.6 };
-    gsap.timeline()
-      .to(o, { v: 78.2, duration: 1.8, ease: "power2.inOut", onUpdate: () => (latEl.textContent = o.v.toFixed(1)) })
-      .to(".loader__bar span", { scaleX: 1, duration: 1.8, ease: "power2.inOut" }, 0)
-      .to(loader, { yPercent: -100, duration: 1.1, ease: "expo.inOut", onComplete: () => { loader.remove(); done(); } }, "+=.15")
-      .add(heroIn, "-=.5");
+    // page préchargée en arrière-plan : on attend qu'elle soit vraiment affichée
+    if (document.prerendering) document.addEventListener("prerenderingchange", heroIn, { once: true });
+    else heroIn();
   }
 
-  goal();
   modals();
   forms();
   nav();
@@ -398,6 +401,6 @@
   topo();
   snow();
   scrollFx();
-  if (!hasGsap || reduce) { const c = $(".curtain"); if (c) c.style.display = "none"; }
+  goal();
   intro();
 })();

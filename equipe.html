@@ -13,14 +13,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=1790275169">
-  <script>document.documentElement.classList.add("js")</script>
+  <link rel="stylesheet" href="css/style.css?v=1790277311">
+  <script type="speculationrules">{"prefetch":[{"source":"list","urls":["index.html","voyage.html","svalbard.html","equipe.html","soutenir.html"],"eagerness":"eager"}],"prerender":[{"source":"document","where":{"selector_matches":"a[href$='.html']"},"eagerness":"moderate"}]}</script>
 </head>
 <body data-page="equipe">
-  <div class="curtain" aria-hidden="true"><img src="assets/img/logo-blanc.png" alt=""></div>
+  <script src="js/config.js?v=1790277311"></script>
+  <script src="js/layout.js?v=1790277311"></script>
   <canvas class="topo" aria-hidden="true"></canvas>
   <div class="grain" aria-hidden="true"></div>
-  <div id="site-header"></div>
   <main>
     <section class="phero">
       <div class="phero__media"><img src="assets/img/isfjorden-panorama.jpg" alt="Une cabane au bord de l'Isfjorden, au pied d'une montagne" fetchpriority="high"></div>
@@ -32,26 +32,27 @@
       <span class="phero__credit">Photo : Buiobuione · CC BY-SA 4.0</span>
     </section>
 
-    <section class="team">
+    <section class="team" id="eleves">
       <div class="team__head">
         <p class="eyebrow">Les élèves</p>
         <h2>Chacun<br><em>son thème</em></h2>
         <p>Sur le terrain, chaque élève prend en charge un thème d'étude, pour ramener des observations complètes et variées.</p>
+        <p class="note"><b>*</b> Il s'agit de la répartition de départ : les rôles de chacun seront finalisés avec l'encadrement et pourront encore changer.</p>
       </div>
       <ol class="team__list" data-stagger>
-        <li><span class="mono">01</span><b>Fédor Naeher</b><em>Faune</em></li>
-        <li><span class="mono">02</span><b>Nicolas Balta</b><em>Faune</em></li>
-        <li><span class="mono">03</span><b>Noah Boulos</b><em>Journal de bord</em></li>
-        <li><span class="mono">04</span><b>Salma Ottiger</b><em>Caméra &amp; témoignages</em></li>
-        <li><span class="mono">05</span><b>Amita Gremaud</b><em>Caméra &amp; témoignages</em></li>
-        <li><span class="mono">06</span><b>Elise Guerre</b><em>Journal de bord</em></li>
-        <li><span class="mono">07</span><b>Melissa Cerdeira</b><em>Terrain &amp; plantes</em></li>
-        <li><span class="mono">08</span><b>Zora Bindschedler</b><em>Journal de bord</em></li>
-        <li><span class="mono">09</span><b>Chloé Esseiva</b><em>Pollution &amp; climat</em></li>
+        <li><span class="mono">01</span><b>Fédor Naeher</b><em>Faune<sup class="ast">*</sup></em></li>
+        <li><span class="mono">02</span><b>Nicolas Balta</b><em>Faune<sup class="ast">*</sup></em></li>
+        <li><span class="mono">03</span><b>Noah Boulos</b><em>Journal de bord<sup class="ast">*</sup></em></li>
+        <li><span class="mono">04</span><b>Salma Ottiger</b><em>Caméra &amp; témoignages<sup class="ast">*</sup></em></li>
+        <li><span class="mono">05</span><b>Amita Gremaud</b><em>Caméra &amp; témoignages<sup class="ast">*</sup></em></li>
+        <li><span class="mono">06</span><b>Elise Guerre</b><em>Journal de bord<sup class="ast">*</sup></em></li>
+        <li><span class="mono">07</span><b>Melissa Cerdeira</b><em>Terrain &amp; plantes<sup class="ast">*</sup></em></li>
+        <li><span class="mono">08</span><b>Zora Bindschedler</b><em>Journal de bord<sup class="ast">*</sup></em></li>
+        <li><span class="mono">09</span><b>Chloé Esseiva</b><em>Pollution &amp; climat<sup class="ast">*</sup></em></li>
       </ol>
     </section>
 
-    <section class="crewsec">
+    <section class="crewsec" id="encadrement">
       <p class="eyebrow">L'encadrement</p>
       <h2>Entourés <em>des meilleurs</em></h2>
       <div class="crew__list" data-accordion>
@@ -63,7 +64,7 @@
       </div>
     </section>
 
-    <section class="assocsec">
+    <section class="assocsec" id="association">
       <div class="assoc spot">
         <img src="assets/img/logo-blanc.png" alt="Logo Des Alpes à l'Arctique, dessiné par un membre du groupe">
         <div>
@@ -83,17 +84,16 @@
     </section>
   </main>
   <div id="site-footer"></div>
+  <script>SvalbardLayout.footer()</script>
   <div class="lightbox" aria-hidden="true"><img alt=""><p></p><button class="round" aria-label="Fermer">✕</button></div>
 
-  <script src="js/config.js?v=1790275169"></script>
-  <script src="js/layout.js?v=1790275169"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3-array@3/dist/d3-array.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3-contour@4/dist/d3-contour.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-  <script src="js/pay.js?v=1790275169"></script>
-  <script src="js/main.js?v=1790275169"></script>
+  <script src="js/pay.js?v=1790277311"></script>
+  <script src="js/main.js?v=1790277311"></script>
 </body>
 </html>

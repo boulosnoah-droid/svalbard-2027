@@ -1,6 +1,6 @@
 /* ==========================================================================
    Dons : fenêtre en 3 étapes + moyens de paiement
-   (TWINT, QR-facture suisse, virement, carte en option).
+   (TWINT, virement, carte en option).
    ========================================================================== */
 window.SvalbardPay = (() => {
   const CFG = window.SITE_CONFIG || {};
@@ -10,7 +10,7 @@ window.SvalbardPay = (() => {
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   /* ---------- QR code (bibliothèque qrcode-generator) ---------- */
-  function qrSvg(text, { swiss = false } = {}) {
+  function qrSvg(text) {
     if (typeof qrcode === "undefined") return "";
     qrcode.stringToBytes = (s) => Array.from(new TextEncoder().encode(s)); // UTF-8
     const qr = qrcode(0, "M");
@@ -19,33 +19,8 @@ window.SvalbardPay = (() => {
     const n = qr.getModuleCount(), q = 2, size = n + q * 2;
     let d = "";
     for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) d += `M${c + q} ${r + q}h1v1h-1z`;
-    // Croix suisse au centre (7 mm sur 46 mm), exigée par la norme QR-facture
-    let cross = "";
-    if (swiss) {
-      const s = size * 7 / 46, x = (size - s) / 2, u = s / 7;
-      cross = `<rect x="${x}" y="${x}" width="${s}" height="${s}" fill="#fff"/><rect x="${x + u * .5}" y="${x + u * .5}" width="${u * 6}" height="${u * 6}" fill="#000"/>` +
-        `<rect x="${x + u * 3}" y="${x + u * 1.5}" width="${u}" height="${u * 4}" fill="#fff"/><rect x="${x + u * 1.5}" y="${x + u * 3}" width="${u * 4}" height="${u}" fill="#fff"/>`;
-    }
-    return `<svg class="qr" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges" role="img" aria-label="QR code"><rect width="${size}" height="${size}" fill="#fff"/><path d="${d}" fill="#000"/>${cross}</svg>`;
+    return `<svg class="qr" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges" role="img" aria-label="QR code"><rect width="${size}" height="${size}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
   }
-
-  /* ---------- contenu du QR-facture suisse (norme SIX, version 2.0) ---------- */
-  function swissPayload(amount, message) {
-    const c = CFG.creditor || {};
-    const iban = (CFG.iban || "").replace(/\s/g, "");
-    return [
-      "SPC", "0200", "1", iban,
-      "S", c.name || "", c.street || "", c.number || "", c.zip || "", c.town || "", c.country || "CH",
-      "", "", "", "", "", "", "",               // créancier final (vide)
-      Number(amount).toFixed(2), "CHF",
-      "", "", "", "", "", "", "",               // débiteur (vide : le donateur complète dans son app)
-      "NON", "", message.slice(0, 140), "EPD",
-    ].join("\n");
-  }
-  const swissReady = () => {
-    const c = CFG.creditor || {};
-    return CFG.iban && c.name && c.street && c.zip && c.town;
-  };
 
   const soon = (what) => `<div class="pay__soon"><span>Bientôt disponible</span><p>${what} sera activé dès l'ouverture du compte de l'association. En attendant, votre promesse de don est bien enregistrée : nous vous recontactons par e-mail.</p></div>`;
   const copyRow = (label, value) => `<div class="copyrow"><span class="mono">${label}</span><b>${esc(value)}</b><button type="button" class="copy" data-copy="${esc(value)}">Copier</button></div>`;
@@ -61,15 +36,9 @@ window.SvalbardPay = (() => {
           <a class="btn btn--accent" href="${esc(CFG.twintLink)}" target="_blank" rel="noopener"><span>Payer CHF ${fmt(d.montant)} avec TWINT ↗</span></a>
           <p class="pay__hint">Indiquez le montant de <b>CHF ${fmt(d.montant)}</b> si l'app vous le demande.</p></div></div>`
       : soon("Le paiement TWINT");
-    // QR-facture
-    $('[data-panel="qr"]', form).innerHTML = swissReady()
-      ? `<div class="pay__twint"><div class="pay__qr">${qrSvg(swissPayload(d.montant, msg), { swiss: true })}</div>
-          <div><p>Scannez ce QR-facture avec l'application de votre banque (e-banking) : le montant et le bénéficiaire sont déjà remplis.</p>
-          <p class="pay__hint">Compatible avec toutes les banques suisses et PostFinance.</p></div></div>`
-      : soon("Le QR-facture");
     // Virement
     $('[data-panel="virement"]', form).innerHTML = CFG.iban
-      ? `<div class="copyrows">${copyRow("IBAN", CFG.iban)}${copyRow("Bénéficiaire", (CFG.creditor || {}).name || "")}${copyRow("Montant", "CHF " + Number(d.montant).toFixed(2))}${copyRow("Communication", msg)}</div>${CFG.bank ? `<p class="pay__hint">${esc(CFG.bank)}</p>` : ""}`
+      ? `<div class="copyrows">${copyRow("IBAN", CFG.iban)}${copyRow("Bénéficiaire", CFG.accountHolder || "Association Des Alpes à l'Arctique")}${copyRow("Montant", "CHF " + Number(d.montant).toFixed(2))}${copyRow("Communication", msg)}</div>${CFG.bank ? `<p class="pay__hint">${esc(CFG.bank)}</p>` : ""}`
       : soon("Le virement");
     // Carte (facultatif)
     const cardTab = $('[data-tab="carte"]', form);
@@ -119,11 +88,15 @@ window.SvalbardPay = (() => {
       const d = {
         montant: amount(), type: form.type.value, prenom: form.prenom.value.trim(), nom: form.nom.value.trim(),
         organisation: form.organisation.value.trim(), email: form.email.value.trim(), message: form.message.value.trim(),
-        nomPublic: form.public.checked ? "oui" : "non",
+        nomPublic: form.affichage.value === "nom" ? "oui" : "non",
       };
       d.reference = `Don Svalbard 2027 – ${d.prenom} ${d.nom}`;
+      d.affichage = form.affichage.value; // "anonyme" ou "nom"
       const btn = $('button[type="submit"]', form); btn.disabled = true;
-      await send("don", d).catch(() => {});
+      const saved = await send("don", d).then(() => true, () => false);
+      $("[data-pay-mail]", form).textContent = saved
+        ? `Un e-mail de confirmation avec ces informations vient de vous être envoyé à ${d.email}.`
+        : "Mode test : l'enregistrement des dons n'est pas encore activé sur ce site.";
       btn.disabled = false;
       $("[data-thanks-name]", form).textContent = d.prenom;
       $("[data-thanks-amount]", form).textContent = "CHF " + fmt(d.montant);
@@ -133,5 +106,5 @@ window.SvalbardPay = (() => {
     dialog.addEventListener("close", () => { if ($('[data-step="3"]', form).classList.contains("is-on")) { form.reset(); amountField.hidden = true; org.hidden = true; go(1); } });
   }
 
-  return { init, qrSvg, swissPayload };
+  return { init, qrSvg };
 })();
